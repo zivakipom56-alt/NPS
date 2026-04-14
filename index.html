@@ -1,1 +1,450 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>NPS по направлениям</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fa;
+      margin: 0;
+      padding: 40px 20px;
+      color: #1f2937;
+    }
 
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 32px;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: 32px;
+    }
+
+    p {
+      margin: 0 0 20px;
+      color: #4b5563;
+    }
+
+    input, button {
+      padding: 12px 16px;
+      margin: 10px 6px;
+      font-size: 16px;
+      border-radius: 10px;
+    }
+
+    input[type="file"] {
+      border: 1px solid #d1d5db;
+      background: #fff;
+    }
+
+    button {
+      background: #0a66c2;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.95;
+    }
+
+    .note {
+      margin-top: 20px;
+      text-align: left;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .status {
+      margin-top: 18px;
+      font-size: 15px;
+      min-height: 22px;
+    }
+
+    .ok {
+      color: #047857;
+    }
+
+    .error {
+      color: #b91c1c;
+      white-space: pre-wrap;
+      text-align: left;
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    code {
+      background: #eef2ff;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>NPS по направлениям</h1>
+    <p>Загрузи Excel-файл, приложение само попробует распознать нужные столбцы.</p>
+
+    <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
+    <br />
+    <button onclick="processFile()">Рассчитать и скачать</button>
+
+    <div id="status" class="status"></div>
+
+    <div class="note">
+      <strong>Что ищет приложение:</strong><br />
+      <code>курс</code>, <code>координатор</code>, <code>рекомендовать</code>,
+      <code>применимость</code>, <code>понятность</code>, <code>организация</code>.<br /><br />
+      Даже если названия отличаются, например:
+      <br />— <code>Курс</code> вместо <code>Наименование мероприятия</code>
+      <br />— <code>ФИО координатора</code> вместо <code>ФИО Координатора</code>
+      <br />— <code>Организация обучения</code> вместо <code>Организация учебного мероприятия</code>
+      <br />— должно сработать.
+    </div>
+  </div>
+
+  <script>
+    const directionMap = {
+      "Зайнуллин": "Механика",
+      "Бородина": "Электротехнические системы",
+      "Каримова": "Технология и производство / Центральные и заводские лаборатории",
+      "Клюй": "Теплоэнергетика / ОЗХ",
+      "Борисенко": "Метрология / АСУТП",
+      "Александрова": "Медицина / Охрана труда",
+      "Лебедева": "Цифровые инструменты для производства / Тех. независимость / Экология"
+    };
+
+    function setStatus(message, type = "") {
+      const el = document.getElementById("status");
+      el.className = "status " + type;
+      el.textContent = message;
+    }
+
+    function normalizeText(value) {
+      return String(value ?? "")
+        .toLowerCase()
+        .replace(/ё/g, "е")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
+    function getDirection(name) {
+      const fullName = String(name ?? "");
+      for (const key of Object.keys(directionMap)) {
+        if (fullName.includes(key)) {
+          return directionMap[key];
+        }
+      }
+      return "Прочее";
+    }
+
+    function toNumber(value) {
+      if (value === null || value === undefined || value === "") return null;
+      if (typeof value === "number" && Number.isFinite(value)) return value;
+
+      const prepared = String(value).replace(",", ".").trim();
+      const num = Number(prepared);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function calcNPS(values) {
+      const validValues = values
+        .map(toNumber)
+        .filter(v => v !== null && v >= 0 && v <= 10);
+
+      if (!validValues.length) return 0;
+
+      let promoters = 0;
+      let detractors = 0;
+
+      validValues.forEach(v => {
+        if (v >= 9) promoters++;
+        else if (v <= 6) detractors++;
+      });
+
+      return ((promoters / validValues.length) - (detractors / validValues.length)) * 100;
+    }
+
+    function avg(arr) {
+      const valid = arr.filter(v => typeof v === "number" && Number.isFinite(v));
+      if (!valid.length) return 0;
+      return valid.reduce((sum, v) => sum + v, 0) / valid.length;
+    }
+
+    function round2(value) {
+      return Math.round((value + Number.EPSILON) * 100) / 100;
+    }
+
+    function findColumn(headers, matchers) {
+      const normalizedHeaders = headers.map(h => ({
+        original: h,
+        normalized: normalizeText(h)
+      }));
+
+      for (const matcher of matchers) {
+        const found = normalizedHeaders.find(h => matcher(h.normalized));
+        if (found) return found.original;
+      }
+
+      return null;
+    }
+
+    function detectColumns(headers) {
+      const courseCol = findColumn(headers, [
+        h => h.includes("наименование мероприятия"),
+        h => h.includes("название мероприятия"),
+        h => h.includes("наименование курса"),
+        h => h.includes("название курса"),
+        h => h === "курс",
+        h => h.includes("курс"),
+        h => h.includes("мероприят")
+      ]);
+
+      const coordinatorCol = findColumn(headers, [
+        h => h.includes("фио координатора"),
+        h => h.includes("координатор"),
+        h => h.includes("фио ответственного"),
+        h => h.includes("ответственный"),
+        h => h.includes("преподаватель")
+      ]);
+
+      const recommendCol = findColumn(headers, [
+        h => h.includes("готовность рекомендовать"),
+        h => h.includes("рекомендовать коллегам"),
+        h => h.includes("готовность рекоменд"),
+        h => h.includes("рекомендовать"),
+        h => h.includes("nps")
+      ]);
+
+      const applicabilityCol = findColumn(headers, [
+        h => h.includes("применимость в работе"),
+        h => h.includes("применимость"),
+        h => h.includes("полезность в работе"),
+        h => h.includes("полезность"),
+        h => h.includes("применен")
+      ]);
+
+      const clarityCol = findColumn(headers, [
+        h => h.includes("понятность донесения информации"),
+        h => h.includes("понятность донесения"),
+        h => h.includes("понятность"),
+        h => h.includes("доступность изложения"),
+        h => h.includes("ясность")
+      ]);
+
+      const organizationCol = findColumn(headers, [
+        h => h.includes("организация учебного мероприятия"),
+        h => h.includes("организация обучения"),
+        h => h.includes("организация мероприятия"),
+        h => h.includes("организация"),
+        h => h.includes("обучения")
+      ]);
+
+      return {
+        courseCol,
+        coordinatorCol,
+        recommendCol,
+        applicabilityCol,
+        clarityCol,
+        organizationCol
+      };
+    }
+
+    function validateColumns(columns, headers) {
+      const missing = [];
+
+      if (!columns.courseCol) missing.push("Не найден столбец с курсом");
+      if (!columns.coordinatorCol) missing.push("Не найден столбец с координатором");
+      if (!columns.recommendCol) missing.push("Не найден столбец 'Рекомендовать'");
+      if (!columns.applicabilityCol) missing.push("Не найден столбец 'Применимость'");
+      if (!columns.clarityCol) missing.push("Не найден столбец 'Понятность'");
+      if (!columns.organizationCol) missing.push("Не найден столбец 'Организация'");
+
+      if (missing.length) {
+        throw new Error(
+          missing.join("\n") +
+          "\n\nНайденные заголовки в файле:\n- " +
+          headers.join("\n- ")
+        );
+      }
+    }
+
+    function processFile() {
+      try {
+        const file = document.getElementById("fileInput").files[0];
+        if (!file) {
+          setStatus("Сначала загрузи Excel-файл.", "error");
+          return;
+        }
+
+        setStatus("Читаю файл...");
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: "array" });
+
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+
+            const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+            if (!rows.length) {
+              throw new Error("Файл пустой или первая вкладка не содержит данных.");
+            }
+
+            const headers = Object.keys(rows[0]);
+            const columns = detectColumns(headers);
+            validateColumns(columns, headers);
+
+            const grouped = {};
+
+            rows.forEach(row => {
+              const course = String(row[columns.courseCol] ?? "").trim();
+              const coordinator = String(row[columns.coordinatorCol] ?? "").trim();
+
+              if (!course) return;
+
+              const direction = getDirection(coordinator);
+
+              if (!grouped[direction]) {
+                grouped[direction] = {};
+              }
+
+              if (!grouped[direction][course]) {
+                grouped[direction][course] = {
+                  rec: [],
+                  use: [],
+                  clear: [],
+                  org: []
+                };
+              }
+
+              grouped[direction][course].rec.push(row[columns.recommendCol]);
+              grouped[direction][course].use.push(row[columns.applicabilityCol]);
+              grouped[direction][course].clear.push(row[columns.clarityCol]);
+              grouped[direction][course].org.push(row[columns.organizationCol]);
+            });
+
+            const directionsResult = [];
+            const coursesResult = [];
+
+            const totalByDirections = {
+              rec: [],
+              use: [],
+              clear: [],
+              org: [],
+              total: []
+            };
+
+            Object.keys(grouped).forEach(direction => {
+              const directionMetrics = {
+                rec: [],
+                use: [],
+                clear: [],
+                org: []
+              };
+
+              Object.keys(grouped[direction]).forEach(course => {
+                const data = grouped[direction][course];
+
+                const rec = round2(calcNPS(data.rec));
+                const use = round2(calcNPS(data.use));
+                const clear = round2(calcNPS(data.clear));
+                const org = round2(calcNPS(data.org));
+                const total = round2(avg([rec, use, clear, org]));
+
+                coursesResult.push({
+                  "Направление": direction,
+                  "Курс": course,
+                  "Рекомендовать": rec,
+                  "Применимость": use,
+                  "Понятность": clear,
+                  "Организация": org,
+                  "Общий NPS": total
+                });
+
+                directionMetrics.rec.push(rec);
+                directionMetrics.use.push(use);
+                directionMetrics.clear.push(clear);
+                directionMetrics.org.push(org);
+              });
+
+              const rec = round2(avg(directionMetrics.rec));
+              const use = round2(avg(directionMetrics.use));
+              const clear = round2(avg(directionMetrics.clear));
+              const org = round2(avg(directionMetrics.org));
+              const total = round2(avg([rec, use, clear, org]));
+
+              directionsResult.push({
+                "Направление": direction,
+                "Рекомендовать": rec,
+                "Применимость": use,
+                "Понятность": clear,
+                "Организация": org,
+                "Общий NPS": total
+              });
+
+              totalByDirections.rec.push(rec);
+              totalByDirections.use.push(use);
+              totalByDirections.clear.push(clear);
+              totalByDirections.org.push(org);
+              totalByDirections.total.push(total);
+            });
+
+            directionsResult.push({
+              "Направление": "ИТОГО",
+              "Рекомендовать": round2(avg(totalByDirections.rec)),
+              "Применимость": round2(avg(totalByDirections.use)),
+              "Понятность": round2(avg(totalByDirections.clear)),
+              "Организация": round2(avg(totalByDirections.org)),
+              "Общий NPS": round2(avg(totalByDirections.total))
+            });
+
+            const outputWorkbook = XLSX.utils.book_new();
+
+            const summarySheet = XLSX.utils.json_to_sheet(directionsResult);
+            const coursesSheet = XLSX.utils.json_to_sheet(coursesResult);
+
+            XLSX.utils.book_append_sheet(outputWorkbook, summarySheet, "Сводка");
+            XLSX.utils.book_append_sheet(outputWorkbook, coursesSheet, "Курсы");
+
+            XLSX.writeFile(outputWorkbook, "NPS_результат.xlsx");
+
+            setStatus(
+              "Готово: файл обработан, колонки распознаны автоматически, результат скачан.",
+              "ok"
+            );
+          } catch (error) {
+            setStatus(error.message || "Ошибка обработки файла.", "error");
+          }
+        };
+
+        reader.onerror = function () {
+          setStatus("Не удалось прочитать файл.", "error");
+        };
+
+        reader.readAsArrayBuffer(file);
+      } catch (error) {
+        setStatus(error.message || "Непредвиденная ошибка.", "error");
+      }
+    }
+  </script>
+</body>
+</html>
