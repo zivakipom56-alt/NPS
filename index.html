@@ -485,7 +485,7 @@
         <div class="actions">
           <button class="btn btn-primary" onclick="processFile()">Рассчитать</button>
           <button class="btn btn-secondary" onclick="downloadResult()" id="downloadBtn" disabled>Скачать Excel</button>
-          <button class="btn btn-secondary" onclick="openHelp()">Инструкция</button>
+          <button class="btn btn-secondary" id="helpBtn" type="button">Инструкция</button>
         </div>
 
         <div id="status" class="status">Ожидаю Excel-файл.</div>
@@ -570,7 +570,7 @@
 
   <div id="helpModal" class="modal">
     <div class="modal-content">
-      <span class="close" onclick="closeHelp()">×</span>
+      <span class="close" id="helpClose">×</span>
 
       <h2>Инструкция</h2>
 
@@ -671,26 +671,38 @@
 
     Chart.register(valueLabelsPlugin);
 
-    document.getElementById("fileInput").addEventListener("change", function () {
-      const file = this.files[0];
-      document.getElementById("fileName").textContent = file ? file.name : "Файл не выбран";
-      document.getElementById("modeBadge").textContent = file ? "Файл выбран" : "Ожидание файла";
-    });
+    document.addEventListener("DOMContentLoaded", function () {
+      const fileInput = document.getElementById("fileInput");
+      const helpBtn = document.getElementById("helpBtn");
+      const helpModal = document.getElementById("helpModal");
+      const helpClose = document.getElementById("helpClose");
 
-    function openHelp() {
-      document.getElementById("helpModal").style.display = "block";
-    }
-
-    function closeHelp() {
-      document.getElementById("helpModal").style.display = "none";
-    }
-
-    window.onclick = function(event) {
-      const modal = document.getElementById("helpModal");
-      if (event.target === modal) {
-        modal.style.display = "none";
+      if (fileInput) {
+        fileInput.addEventListener("change", function () {
+          const file = this.files[0];
+          document.getElementById("fileName").textContent = file ? file.name : "Файл не выбран";
+          document.getElementById("modeBadge").textContent = file ? "Файл выбран" : "Ожидание файла";
+        });
       }
-    };
+
+      if (helpBtn && helpModal) {
+        helpBtn.addEventListener("click", function () {
+          helpModal.style.display = "block";
+        });
+      }
+
+      if (helpClose && helpModal) {
+        helpClose.addEventListener("click", function () {
+          helpModal.style.display = "none";
+        });
+      }
+
+      window.addEventListener("click", function (event) {
+        if (event.target === helpModal) {
+          helpModal.style.display = "none";
+        }
+      });
+    });
 
     function showTab(tabId, button) {
       document.querySelectorAll(".panel").forEach(panel => panel.classList.remove("active"));
@@ -727,4 +739,615 @@
       if (n.includes("цифровые инструменты")) return ["Цифровые", "инструменты"];
       if (n.includes("медицина") && n.includes("охрана труда")) return ["Медицина", "/ ОТ"];
       if (n.includes("метрология") && n.includes("асутп")) return ["Метрология", "/ АСУТП"];
-      if (n.includes("проч
+      if (n.includes("прочее")) return ["Прочее"];
+
+      const parts = String(name).split(" ");
+      if (parts.length <= 1) return [name];
+      const middle = Math.ceil(parts.length / 2);
+      return [parts.slice(0, middle).join(" "), parts.slice(middle).join(" ")];
+    }
+
+    function toNumber(value) {
+      if (value === null || value === undefined || value === "") return null;
+      if (typeof value === "number" && Number.isFinite(value)) return value;
+      const prepared = String(value).replace(",", ".").replace("%", "").trim();
+      const num = Number(prepared);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function calcNPS(values) {
+      const validValues = values
+        .map(toNumber)
+        .filter(v => v !== null && v >= 0 && v <= 10);
+
+      if (!validValues.length) return 0;
+
+      let promoters = 0;
+      let detractors = 0;
+
+      validValues.forEach(v => {
+        if (v >= 9) promoters++;
+        else if (v <= 6) detractors++;
+      });
+
+      return ((promoters / validValues.length) - (detractors / validValues.length)) * 100;
+    }
+
+    function avg(arr) {
+      const valid = arr.filter(v => typeof v === "number" && Number.isFinite(v));
+      if (!valid.length) return 0;
+      return valid.reduce((sum, v) => sum + v, 0) / valid.length;
+    }
+
+    function round2(value) {
+      return Math.round((value + Number.EPSILON) * 100) / 100;
+    }
+
+    function formatValue(value) {
+      return Number(value).toFixed(2);
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function findColumn(headers, matchers) {
+      const normalizedHeaders = headers.map(h => ({
+        original: h,
+        normalized: normalizeText(h)
+      }));
+
+      for (const matcher of matchers) {
+        const found = normalizedHeaders.find(h => matcher(h.normalized));
+        if (found) return found.original;
+      }
+
+      return null;
+    }
+
+    function detectRawColumns(headers) {
+      const courseCol = findColumn(headers, [
+        h => h.includes("наименование мероприятия"),
+        h => h.includes("название мероприятия"),
+        h => h.includes("наименование курса"),
+        h => h.includes("название курса"),
+        h => h === "курс",
+        h => h.includes("курс"),
+        h => h.includes("мероприят")
+      ]);
+
+      const coordinatorCol = findColumn(headers, [
+        h => h.includes("фио координатора"),
+        h => h.includes("координатор"),
+        h => h.includes("фио ответственного"),
+        h => h.includes("ответственный"),
+        h => h.includes("преподаватель")
+      ]);
+
+      const recommendCol = findColumn(headers, [
+        h => h.includes("готовность рекомендовать"),
+        h => h.includes("рекомендовать коллегам"),
+        h => h.includes("готовность рекоменд"),
+        h => h.includes("рекомендовать"),
+        h => h === "nps",
+        h => h.includes("nps")
+      ]);
+
+      const applicabilityCol = findColumn(headers, [
+        h => h.includes("применимость в работе"),
+        h => h.includes("применимость"),
+        h => h.includes("полезность в работе"),
+        h => h.includes("полезность")
+      ]);
+
+      const clarityCol = findColumn(headers, [
+        h => h.includes("понятность донесения информации"),
+        h => h.includes("понятность донесения"),
+        h => h.includes("понятность"),
+        h => h.includes("доступность изложения"),
+        h => h.includes("ясность")
+      ]);
+
+      const organizationCol = findColumn(headers, [
+        h => h.includes("организация учебного мероприятия"),
+        h => h.includes("организация обучения"),
+        h => h.includes("организация мероприятия"),
+        h => h === "организация",
+        h => h.includes("организация")
+      ]);
+
+      return {
+        courseCol,
+        coordinatorCol,
+        recommendCol,
+        applicabilityCol,
+        clarityCol,
+        organizationCol
+      };
+    }
+
+    function detectSummaryColumns(headers) {
+      const directionCol = findColumn(headers, [
+        h => h === "направление",
+        h => h.includes("направление")
+      ]);
+
+      const recommendCol = findColumn(headers, [
+        h => h === "рекомендовать",
+        h => h.includes("рекомендовать")
+      ]);
+
+      const applicabilityCol = findColumn(headers, [
+        h => h === "применимость",
+        h => h.includes("применимость")
+      ]);
+
+      const clarityCol = findColumn(headers, [
+        h => h === "понятность",
+        h => h.includes("понятность")
+      ]);
+
+      const organizationCol = findColumn(headers, [
+        h => h === "организация",
+        h => h.includes("организация")
+      ]);
+
+      const totalCol = findColumn(headers, [
+        h => h === "общий nps",
+        h => h.includes("общий nps"),
+        h => h.includes("итоговый nps")
+      ]);
+
+      return {
+        directionCol,
+        recommendCol,
+        applicabilityCol,
+        clarityCol,
+        organizationCol,
+        totalCol
+      };
+    }
+
+    function isRawMode(cols) {
+      return !!(
+        cols.courseCol &&
+        cols.coordinatorCol &&
+        cols.recommendCol &&
+        cols.applicabilityCol &&
+        cols.clarityCol &&
+        cols.organizationCol
+      );
+    }
+
+    function isSummaryMode(cols) {
+      return !!(
+        cols.directionCol &&
+        cols.recommendCol &&
+        cols.applicabilityCol &&
+        cols.clarityCol &&
+        cols.organizationCol
+      );
+    }
+
+    function renderSummaryTable(data) {
+      const body = document.getElementById("summaryTableBody");
+
+      if (!data.length) {
+        body.innerHTML = `<tr><td colspan="6">Нет данных для отображения.</td></tr>`;
+        return;
+      }
+
+      body.innerHTML = data.map(row => {
+        const totalClass = row["Направление"] === "ИТОГО" ? "total-row" : "";
+        return `
+          <tr class="${totalClass}">
+            <td>${escapeHtml(row["Направление"])}</td>
+            <td>${formatValue(row["Рекомендовать"])}</td>
+            <td>${formatValue(row["Применимость"])}</td>
+            <td>${formatValue(row["Понятность"])}</td>
+            <td>${formatValue(row["Организация"])}</td>
+            <td>${formatValue(row["Общий NPS"])}</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    function renderTopMetrics(totalRow) {
+      if (!totalRow) return;
+      document.getElementById("topMetrics").style.display = "grid";
+      document.getElementById("topRec").textContent = formatValue(totalRow["Рекомендовать"]);
+      document.getElementById("topUse").textContent = formatValue(totalRow["Применимость"]);
+      document.getElementById("topClear").textContent = formatValue(totalRow["Понятность"]);
+      document.getElementById("topOrg").textContent = formatValue(totalRow["Организация"]);
+      document.getElementById("topTotal").textContent = formatValue(totalRow["Общий NPS"]);
+    }
+
+    function buildSummaryChart(directionsResult) {
+      const dataRows = directionsResult.filter(
+        row => normalizeText(row["Направление"]) !== "итого"
+      );
+
+      const labels = dataRows.map(row => wrapDirectionName(row["Направление"]));
+      const recommendData = dataRows.map(row => row["Рекомендовать"]);
+      const applicabilityData = dataRows.map(row => row["Применимость"]);
+      const clarityData = dataRows.map(row => row["Понятность"]);
+      const organizationData = dataRows.map(row => row["Организация"]);
+
+      const ctx = document.getElementById("summaryChart").getContext("2d");
+
+      if (summaryChartInstance) {
+        summaryChartInstance.destroy();
+      }
+
+      summaryChartInstance = new Chart(ctx, {
+        data: {
+          labels,
+          datasets: [
+            {
+              type: "bar",
+              label: "% готовность рекомендовать - NPS",
+              data: recommendData,
+              backgroundColor: "#0d6b73",
+              borderColor: "#0d6b73",
+              borderWidth: 1,
+              borderRadius: 0,
+              barThickness: 28,
+              order: 1
+            },
+            {
+              type: "bar",
+              label: "% применимость в работе - NPS",
+              data: applicabilityData,
+              backgroundColor: "#44c4a1",
+              borderColor: "#44c4a1",
+              borderWidth: 1,
+              borderRadius: 0,
+              barThickness: 28,
+              order: 1
+            },
+            {
+              type: "bar",
+              label: "% понятность донесения - NPS",
+              data: clarityData,
+              backgroundColor: "#1e90ff",
+              borderColor: "#1e90ff",
+              borderWidth: 1,
+              borderRadius: 0,
+              barThickness: 28,
+              order: 1
+            },
+            {
+              type: "bar",
+              label: "% организация обучения - NPS",
+              data: organizationData,
+              backgroundColor: "#061826",
+              borderColor: "#061826",
+              borderWidth: 1,
+              borderRadius: 0,
+              barThickness: 28,
+              order: 1
+            },
+            {
+              type: "line",
+              label: "Порог 80%",
+              data: labels.map(() => 80),
+              borderColor: "#f0b323",
+              backgroundColor: "#f0b323",
+              borderWidth: 3,
+              pointRadius: 0,
+              pointHoverRadius: 0,
+              tension: 0,
+              fill: false,
+              order: 99
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          layout: {
+            padding: {
+              top: 34,
+              bottom: 10
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 28,
+                boxHeight: 12,
+                padding: 20,
+                font: {
+                  size: 13
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${Number(context.raw).toFixed(2)}%`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              min: 0,
+              max: 120,
+              ticks: {
+                stepSize: 20,
+                callback: function(value) {
+                  return value + "%";
+                },
+                font: {
+                  size: 13
+                }
+              },
+              grid: {
+                color: "rgba(148, 163, 184, 0.25)"
+              }
+            },
+            x: {
+              offset: true,
+              ticks: {
+                maxRotation: 0,
+                minRotation: 0,
+                autoSkip: false,
+                padding: 12,
+                font: {
+                  size: 13,
+                  weight: "600"
+                }
+              },
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function processRawRows(rows, headers) {
+      const columns = detectRawColumns(headers);
+
+      if (!isRawMode(columns)) {
+        throw new Error(
+          "Не удалось распознать сырой файл с курсами.\n\nНайденные заголовки:\n- " +
+          headers.join("\n- ")
+        );
+      }
+
+      const grouped = {};
+
+      rows.forEach(row => {
+        const course = String(row[columns.courseCol] ?? "").trim();
+        if (!course) return;
+
+        if (!grouped[course]) {
+          grouped[course] = {
+            rec: [],
+            use: [],
+            clear: [],
+            org: []
+          };
+        }
+
+        grouped[course].rec.push(row[columns.recommendCol]);
+        grouped[course].use.push(row[columns.applicabilityCol]);
+        grouped[course].clear.push(row[columns.clarityCol]);
+        grouped[course].org.push(row[columns.organizationCol]);
+      });
+
+      const directionsResult = [];
+      const coursesResult = [];
+      const directionMetrics = { rec: [], use: [], clear: [], org: [], total: [] };
+
+      Object.keys(grouped).forEach(course => {
+        const data = grouped[course];
+
+        const rec = round2(calcNPS(data.rec));
+        const use = round2(calcNPS(data.use));
+        const clear = round2(calcNPS(data.clear));
+        const org = round2(calcNPS(data.org));
+        const total = round2(avg([rec, use, clear, org]));
+
+        coursesResult.push({
+          "Направление": course,
+          "Курс": course,
+          "Рекомендовать": rec,
+          "Применимость": use,
+          "Понятность": clear,
+          "Организация": org,
+          "Общий NPS": total
+        });
+
+        directionsResult.push({
+          "Направление": course,
+          "Рекомендовать": rec,
+          "Применимость": use,
+          "Понятность": clear,
+          "Организация": org,
+          "Общий NPS": total
+        });
+
+        directionMetrics.rec.push(rec);
+        directionMetrics.use.push(use);
+        directionMetrics.clear.push(clear);
+        directionMetrics.org.push(org);
+        directionMetrics.total.push(total);
+      });
+
+      const totalRow = {
+        "Направление": "ИТОГО",
+        "Рекомендовать": round2(avg(directionMetrics.rec)),
+        "Применимость": round2(avg(directionMetrics.use)),
+        "Понятность": round2(avg(directionMetrics.clear)),
+        "Организация": round2(avg(directionMetrics.org)),
+        "Общий NPS": round2(avg(directionMetrics.total))
+      };
+
+      directionsResult.push(totalRow);
+
+      return { directionsResult, coursesResult, totalRow };
+    }
+
+    function processSummaryRows(rows, headers) {
+      const columns = detectSummaryColumns(headers);
+
+      if (!isSummaryMode(columns)) {
+        throw new Error(
+          "Не удалось распознать файл как готовую сводку.\n\nНайденные заголовки:\n- " +
+          headers.join("\n- ")
+        );
+      }
+
+      const directionsResult = rows
+        .map(row => {
+          const direction = String(row[columns.directionCol] ?? "").trim();
+          if (!direction) return null;
+
+          const rec = round2(toNumber(row[columns.recommendCol]) ?? 0);
+          const use = round2(toNumber(row[columns.applicabilityCol]) ?? 0);
+          const clear = round2(toNumber(row[columns.clarityCol]) ?? 0);
+          const org = round2(toNumber(row[columns.organizationCol]) ?? 0);
+
+          let total;
+          if (columns.totalCol) {
+            total = round2(toNumber(row[columns.totalCol]) ?? avg([rec, use, clear, org]));
+          } else {
+            total = round2(avg([rec, use, clear, org]));
+          }
+
+          return {
+            "Направление": direction,
+            "Рекомендовать": rec,
+            "Применимость": use,
+            "Понятность": clear,
+            "Организация": org,
+            "Общий NPS": total
+          };
+        })
+        .filter(Boolean);
+
+      const withoutTotal = directionsResult.filter(r => normalizeText(r["Направление"]) !== "итого");
+
+      const totalRow = {
+        "Направление": "ИТОГО",
+        "Рекомендовать": round2(avg(withoutTotal.map(r => r["Рекомендовать"]))),
+        "Применимость": round2(avg(withoutTotal.map(r => r["Применимость"]))),
+        "Понятность": round2(avg(withoutTotal.map(r => r["Понятность"]))),
+        "Организация": round2(avg(withoutTotal.map(r => r["Организация"]))),
+        "Общий NPS": round2(avg(withoutTotal.map(r => r["Общий NPS"])))
+      };
+
+      const finalDirections = [...withoutTotal, totalRow];
+      return { directionsResult: finalDirections, coursesResult: [], totalRow };
+    }
+
+    function processFile() {
+      try {
+        const file = document.getElementById("fileInput").files[0];
+        if (!file) {
+          setStatus("Сначала выбери Excel-файл.", "error");
+          return;
+        }
+
+        setStatus("Читаю файл...");
+        setModeBadge("Обработка файла");
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: "array" });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+            if (!rows.length) {
+              throw new Error("Файл пустой или первая вкладка не содержит данных.");
+            }
+
+            const headers = Object.keys(rows[0]);
+            const rawCols = detectRawColumns(headers);
+            const summaryCols = detectSummaryColumns(headers);
+
+            let result;
+
+            if (isSummaryMode(summaryCols)) {
+              setModeBadge("Режим: готовая сводка");
+              result = processSummaryRows(rows, headers);
+            } else if (isRawMode(rawCols)) {
+              setModeBadge("Режим: сырой файл");
+              result = processRawRows(rows, headers);
+            } else {
+              throw new Error(
+                "Не удалось определить тип файла.\n\n" +
+                "Ожидается либо:\n" +
+                "1) сырой файл с курсом, координатором и 4 оценками,\n" +
+                "либо\n" +
+                "2) готовая сводка с колонками Направление / Рекомендовать / Применимость / Понятность / Организация.\n\n" +
+                "Найденные заголовки:\n- " + headers.join("\n- ")
+              );
+            }
+
+            lastDirectionsResult = result.directionsResult;
+            lastCoursesResult = result.coursesResult;
+
+            renderSummaryTable(result.directionsResult);
+            renderTopMetrics(result.totalRow);
+            buildSummaryChart(result.directionsResult);
+
+            document.getElementById("downloadBtn").disabled = false;
+            setStatus("Готово. Файл обработан.", "ok");
+          } catch (error) {
+            setStatus(error.message || "Ошибка обработки файла.", "error");
+            setModeBadge("Ошибка распознавания");
+          }
+        };
+
+        reader.onerror = function() {
+          setStatus("Не удалось прочитать файл.", "error");
+          setModeBadge("Ошибка чтения");
+        };
+
+        reader.readAsArrayBuffer(file);
+      } catch (error) {
+        setStatus(error.message || "Непредвиденная ошибка.", "error");
+      }
+    }
+
+    function downloadResult() {
+      try {
+        if (!lastDirectionsResult.length) {
+          setStatus("Сначала рассчитай данные.", "error");
+          return;
+        }
+
+        const wb = XLSX.utils.book_new();
+        const ws1 = XLSX.utils.json_to_sheet(lastDirectionsResult);
+        XLSX.utils.book_append_sheet(wb, ws1, "Сводка");
+
+        if (lastCoursesResult.length) {
+          const ws2 = XLSX.utils.json_to_sheet(lastCoursesResult);
+          XLSX.utils.book_append_sheet(wb, ws2, "Курсы");
+        }
+
+        XLSX.writeFile(wb, "NPS_результат.xlsx");
+        setStatus("Excel-файл скачан.", "ok");
+      } catch (error) {
+        setStatus(error.message || "Не удалось скачать результат.", "error");
+      }
+    }
+  </script>
+</body>
+</html>
