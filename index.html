@@ -15,137 +15,214 @@
 
     body {
       margin: 0;
+      min-height: 100vh;
       font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      color: #1f2937;
-    }
-
-    .page {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 28px 24px 40px;
-    }
-
-    .header {
-      background: linear-gradient(135deg, #0b5cab, #1570d1);
-      color: white;
-      border-radius: 20px;
-      padding: 28px 32px;
-      margin-bottom: 24px;
-      box-shadow: 0 12px 30px rgba(21, 112, 209, 0.22);
-    }
-
-    .header h1 {
-      margin: 0 0 10px;
-      font-size: 36px;
-      line-height: 1.1;
-    }
-
-    .header p {
-      margin: 0;
-      font-size: 17px;
-      opacity: 0.95;
-    }
-
-    .controls {
+      background:
+        radial-gradient(circle at top, #eef5fb 0%, #f6f9fc 38%, #eef3f8 100%);
+      color: #0f172a;
       display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
+      justify-content: center;
+      padding: 42px 18px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 1180px;
+    }
+
+    .hero-space {
+      height: 120px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #e5edf4;
+      border-radius: 30px;
+      box-shadow: 0 20px 60px rgba(15, 23, 42, 0.08);
+      backdrop-filter: blur(10px);
+      padding: 34px 34px 28px;
+    }
+
+    .title {
+      font-size: 68px;
+      line-height: 0.95;
+      font-weight: 800;
+      letter-spacing: -1.8px;
+      text-align: center;
+      margin: 0;
+      color: #081824;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 16px;
+      color: #425466;
+      margin: 14px 0 28px;
+    }
+
+    .upload-box {
+      border: 1px solid #e4ebf2;
+      border-radius: 24px;
+      padding: 22px;
+      background: #fbfdff;
+    }
+
+    .upload-box-header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      margin: 22px 0 18px;
+      gap: 12px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .upload-box-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0;
+    }
+
+    .mode-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: #eef4f8;
+      color: #425466;
+      font-size: 14px;
+      font-weight: 600;
+      border: 1px solid #dbe6ee;
+    }
+
+    .file-row {
+      border: 1px solid #dce6ef;
+      border-radius: 18px;
+      background: white;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 14px;
+      flex-wrap: wrap;
+    }
+
+    .file-input-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
     }
 
     .file-label {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      min-height: 48px;
-      padding: 0 18px;
-      background: white;
-      border: 1px solid #d8e1ee;
+      height: 40px;
+      padding: 0 16px;
+      border: 1px solid #cfdbe6;
       border-radius: 12px;
-      font-size: 15px;
+      background: #f8fbfd;
       cursor: pointer;
-      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+      font-size: 15px;
+      color: #102331;
     }
 
     .file-label input {
       display: none;
     }
 
-    .btn {
-      min-height: 48px;
-      padding: 0 20px;
-      border: none;
-      border-radius: 12px;
-      background: #0b5cab;
-      color: white;
+    .filename {
       font-size: 15px;
-      font-weight: 600;
+      color: #475569;
+      word-break: break-word;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      margin: 22px 0 16px;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 16px;
+      height: 56px;
+      min-width: 240px;
+      padding: 0 28px;
+      font-size: 20px;
+      font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 10px 24px rgba(11, 92, 171, 0.22);
+      transition: transform 0.15s ease, opacity 0.15s ease;
     }
 
     .btn:hover {
-      opacity: 0.95;
+      transform: translateY(-1px);
+      opacity: 0.97;
     }
 
-    .btn.secondary {
-      background: #ffffff;
-      color: #0b5cab;
-      border: 1px solid #c9d8ea;
-      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    .btn-primary {
+      color: white;
+      background: linear-gradient(135deg, #0d7a8e, #0a5c73);
+      box-shadow: 0 14px 28px rgba(10, 92, 115, 0.24);
     }
 
-    .filename {
-      font-size: 14px;
-      color: #4b5563;
+    .btn-secondary {
+      color: #0a5c73;
+      background: white;
+      border: 1px solid #d7e2ea;
     }
 
     .status {
-      margin-top: 8px;
-      min-height: 24px;
-      font-size: 15px;
-      line-height: 1.45;
+      min-height: 56px;
+      border: 1px solid #e4ebf2;
+      border-radius: 18px;
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 16px;
+      text-align: center;
+      font-size: 16px;
+      color: #475569;
+      white-space: pre-wrap;
     }
 
     .status.ok {
       color: #047857;
+      background: #f0fdf4;
+      border-color: #bbf7d0;
     }
 
     .status.error {
       color: #b91c1c;
-      white-space: pre-wrap;
-      background: #fff1f2;
-      border: 1px solid #fecdd3;
-      border-radius: 12px;
-      padding: 12px 14px;
+      background: #fef2f2;
+      border-color: #fecaca;
     }
 
     .tabs {
       display: flex;
-      gap: 10px;
-      margin: 24px 0 20px;
+      gap: 12px;
+      margin: 28px 0 18px;
       flex-wrap: wrap;
     }
 
     .tab-btn {
-      border: none;
+      border: 1px solid #d8e2ea;
       background: white;
-      color: #334155;
-      border-radius: 12px;
+      color: #1e293b;
+      border-radius: 14px;
       padding: 12px 18px;
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 16px;
+      font-weight: 700;
       cursor: pointer;
-      border: 1px solid #d8e1ee;
-      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
     }
 
     .tab-btn.active {
-      background: #0b5cab;
+      background: linear-gradient(135deg, #0d7a8e, #0a5c73);
       color: white;
-      border-color: #0b5cab;
+      border-color: transparent;
     }
 
     .panel {
@@ -156,68 +233,70 @@
       display: block;
     }
 
-    .card {
-      background: white;
-      border-radius: 18px;
-      padding: 22px;
-      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
-      border: 1px solid #e7edf5;
+    .section-card {
+      background: rgba(255, 255, 255, 0.96);
+      border: 1px solid #e5edf4;
+      border-radius: 24px;
+      box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+      padding: 24px;
     }
 
-    .card h2 {
+    .section-title {
       margin: 0 0 8px;
-      font-size: 24px;
+      font-size: 34px;
+      line-height: 1.05;
     }
 
-    .card p {
-      margin: 0 0 18px;
+    .section-subtitle {
+      margin: 0 0 20px;
       color: #5b6472;
+      font-size: 18px;
     }
 
-    .summary-grid {
+    .top-metrics {
       display: grid;
-      grid-template-columns: repeat(5, minmax(180px, 1fr));
+      grid-template-columns: repeat(5, minmax(160px, 1fr));
       gap: 14px;
       margin-bottom: 22px;
     }
 
-    .metric-box {
-      background: #f8fbff;
-      border: 1px solid #dce8f6;
-      border-radius: 16px;
+    .metric {
+      border: 1px solid #dce6ef;
+      border-radius: 18px;
       padding: 16px;
+      background: #f8fbfd;
     }
 
-    .metric-box .label {
+    .metric-label {
       font-size: 13px;
       color: #64748b;
       margin-bottom: 8px;
     }
 
-    .metric-box .value {
-      font-size: 28px;
-      font-weight: 700;
+    .metric-value {
+      font-size: 30px;
+      font-weight: 800;
       color: #0f172a;
     }
 
     .table-wrap {
       width: 100%;
       overflow-x: auto;
-      border-radius: 16px;
       border: 1px solid #dfe7f1;
+      border-radius: 18px;
     }
 
     table {
       width: 100%;
-      min-width: 1100px;
+      min-width: 980px;
       border-collapse: collapse;
       background: white;
     }
 
     thead th {
-      background: #0b5cab;
+      background: linear-gradient(135deg, #0d7a8e, #0a5c73);
       color: white;
-      font-size: 15px;
+      font-size: 16px;
       font-weight: 700;
       padding: 16px 14px;
       text-align: center;
@@ -229,7 +308,6 @@
       border-top: 1px solid #e8eef5;
       font-size: 15px;
       text-align: center;
-      vertical-align: middle;
     }
 
     tbody tr:nth-child(even) {
@@ -237,98 +315,123 @@
     }
 
     tbody tr.total-row {
-      background: #fff9db;
+      background: #fff8db;
       font-weight: 700;
     }
 
     tbody td:first-child,
     thead th:first-child {
       text-align: left;
-      min-width: 280px;
-    }
-
-    .chart-card {
-      padding-bottom: 28px;
+      min-width: 260px;
     }
 
     .chart-wrap {
       position: relative;
       width: 100%;
-      min-height: 520px;
+      min-height: 460px;
     }
 
     #metricsChart {
       width: 100% !important;
-      height: 520px !important;
+      height: 460px !important;
     }
 
-    .legend-note {
-      margin-top: 16px;
-      font-size: 14px;
+    .chart-note {
+      margin-top: 14px;
+      font-size: 15px;
       color: #5b6472;
     }
 
     .helper {
       margin-top: 18px;
-      padding: 16px;
-      background: #f9fbfe;
+      padding: 15px 16px;
+      background: #f8fbfd;
       border: 1px solid #e2e8f0;
-      border-radius: 14px;
-      font-size: 14px;
-      line-height: 1.55;
+      border-radius: 16px;
       color: #475569;
+      font-size: 14px;
+      line-height: 1.5;
     }
 
-    @media (max-width: 1100px) {
-      .summary-grid {
-        grid-template-columns: repeat(2, minmax(180px, 1fr));
+    @media (max-width: 980px) {
+      .title {
+        font-size: 52px;
+      }
+
+      .top-metrics {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
       }
     }
 
-    @media (max-width: 700px) {
-      .page {
-        padding: 18px 14px 28px;
+    @media (max-width: 640px) {
+      body {
+        padding: 22px 12px;
       }
 
-      .header h1 {
-        font-size: 28px;
+      .hero-space {
+        height: 30px;
       }
 
-      .summary-grid {
+      .card {
+        padding: 22px 16px 18px;
+        border-radius: 22px;
+      }
+
+      .title {
+        font-size: 40px;
+      }
+
+      .upload-box-title {
+        font-size: 22px;
+      }
+
+      .btn {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .top-metrics {
         grid-template-columns: 1fr;
       }
 
-      .controls {
-        flex-direction: column;
-        align-items: stretch;
-      }
-
-      .btn, .file-label {
-        width: 100%;
+      .section-title {
+        font-size: 28px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <div class="header">
-      <h1>NPS по направлениям</h1>
-      <p>Загрузи Excel, приложение само распознает нужные столбцы, посчитает NPS и построит график.</p>
+  <div class="app">
+    <div class="hero-space"></div>
+
+    <div class="card">
+      <h1 class="title">NPS по направлениям</h1>
+      <div class="subtitle">Загрузка Excel и автоматический расчёт или отображение готовой сводки</div>
+
+      <div class="upload-box">
+        <div class="upload-box-header">
+          <h2 class="upload-box-title">Выберите файл</h2>
+          <div class="mode-badge" id="modeBadge">Ожидание файла</div>
+        </div>
+
+        <div class="file-row">
+          <div class="file-input-wrap">
+            <label class="file-label">
+              <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
+              Выберите файл
+            </label>
+            <div class="filename" id="fileName">Файл не выбран</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" onclick="processFile()">Рассчитать</button>
+          <button class="btn btn-secondary" onclick="downloadResult()" id="downloadBtn" disabled>Скачать Excel</button>
+        </div>
+
+        <div id="status" class="status">Ожидаю Excel-файл.</div>
+      </div>
     </div>
-
-    <div class="controls">
-      <label class="file-label">
-        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
-        Выбрать Excel-файл
-      </label>
-
-      <button class="btn" onclick="processFile()">Рассчитать</button>
-      <button class="btn secondary" onclick="downloadResult()" id="downloadBtn" disabled>Скачать Excel</button>
-
-      <div class="filename" id="fileName">Файл не выбран</div>
-    </div>
-
-    <div id="status" class="status"></div>
 
     <div class="tabs">
       <button class="tab-btn active" onclick="showTab('summaryTab', this)">Страница 1 — Сводка</button>
@@ -336,35 +439,35 @@
     </div>
 
     <div id="summaryTab" class="panel active">
-      <div class="card">
-        <h2>Сводка по направлениям</h2>
-        <p>Средние NPS по направлениям и общий итог по всем направлениям.</p>
+      <div class="section-card">
+        <h2 class="section-title">Сводка по направлениям</h2>
+        <div class="section-subtitle">Средние NPS по направлениям и общий итог по всем направлениям.</div>
 
-        <div class="summary-grid" id="topMetrics" style="display:none;">
-          <div class="metric-box">
-            <div class="label">Рекомендовать</div>
-            <div class="value" id="topRec">0</div>
+        <div class="top-metrics" id="topMetrics" style="display:none;">
+          <div class="metric">
+            <div class="metric-label">Рекомендовать</div>
+            <div class="metric-value" id="topRec">0.00</div>
           </div>
-          <div class="metric-box">
-            <div class="label">Применимость</div>
-            <div class="value" id="topUse">0</div>
+          <div class="metric">
+            <div class="metric-label">Применимость</div>
+            <div class="metric-value" id="topUse">0.00</div>
           </div>
-          <div class="metric-box">
-            <div class="label">Понятность</div>
-            <div class="value" id="topClear">0</div>
+          <div class="metric">
+            <div class="metric-label">Понятность</div>
+            <div class="metric-value" id="topClear">0.00</div>
           </div>
-          <div class="metric-box">
-            <div class="label">Организация</div>
-            <div class="value" id="topOrg">0</div>
+          <div class="metric">
+            <div class="metric-label">Организация</div>
+            <div class="metric-value" id="topOrg">0.00</div>
           </div>
-          <div class="metric-box">
-            <div class="label">Общий NPS</div>
-            <div class="value" id="topTotal">0</div>
+          <div class="metric">
+            <div class="metric-label">Общий NPS</div>
+            <div class="metric-value" id="topTotal">0.00</div>
           </div>
         </div>
 
         <div class="table-wrap">
-          <table id="summaryTable">
+          <table>
             <thead>
               <tr>
                 <th>Направление</th>
@@ -384,22 +487,23 @@
         </div>
 
         <div class="helper">
-          На первой странице таблица сделана шире и крупнее. Внизу итоговая строка <strong>ИТОГО</strong> — это среднее по всем направлениям.
+          Если загружается сырой файл с курсами и координаторами — приложение само считает NPS.
+          Если загружается уже готовая сводка по направлениям — приложение просто строит таблицу и график.
         </div>
       </div>
     </div>
 
     <div id="chartTab" class="panel">
-      <div class="card chart-card">
-        <h2>График по 4 метрикам</h2>
-        <p>Порог 80% отмечен жёлтой линией. Синие столбцы показывают итоговые значения по всем направлениям.</p>
+      <div class="section-card">
+        <h2 class="section-title">График по 4 метрикам</h2>
+        <div class="section-subtitle">Жёлтая линия показывает порог 80%.</div>
 
         <div class="chart-wrap">
           <canvas id="metricsChart"></canvas>
         </div>
 
-        <div class="legend-note">
-          Жёлтая линия — целевой порог 80%.
+        <div class="chart-note">
+          Синие столбцы — итоговые значения по всем направлениям.
         </div>
       </div>
     </div>
@@ -419,21 +523,17 @@
     let chartInstance = null;
     let lastDirectionsResult = [];
     let lastCoursesResult = [];
+    let lastMode = "";
 
-    document.getElementById("fileInput").addEventListener("change", function() {
+    document.getElementById("fileInput").addEventListener("change", function () {
       const file = this.files[0];
       document.getElementById("fileName").textContent = file ? file.name : "Файл не выбран";
+      document.getElementById("modeBadge").textContent = file ? "Файл выбран" : "Ожидание файла";
     });
 
     function showTab(tabId, button) {
-      document.querySelectorAll(".panel").forEach(panel => {
-        panel.classList.remove("active");
-      });
-
-      document.querySelectorAll(".tab-btn").forEach(btn => {
-        btn.classList.remove("active");
-      });
-
+      document.querySelectorAll(".panel").forEach(panel => panel.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
       document.getElementById(tabId).classList.add("active");
       button.classList.add("active");
     }
@@ -442,6 +542,10 @@
       const el = document.getElementById("status");
       el.className = "status " + type;
       el.textContent = message;
+    }
+
+    function setModeBadge(text) {
+      document.getElementById("modeBadge").textContent = text;
     }
 
     function normalizeText(value) {
@@ -455,9 +559,7 @@
     function getDirection(name) {
       const fullName = String(name ?? "");
       for (const key of Object.keys(directionMap)) {
-        if (fullName.includes(key)) {
-          return directionMap[key];
-        }
+        if (fullName.includes(key)) return directionMap[key];
       }
       return "Прочее";
     }
@@ -465,7 +567,6 @@
     function toNumber(value) {
       if (value === null || value === undefined || value === "") return null;
       if (typeof value === "number" && Number.isFinite(value)) return value;
-
       const prepared = String(value).replace(",", ".").trim();
       const num = Number(prepared);
       return Number.isFinite(num) ? num : null;
@@ -499,6 +600,19 @@
       return Math.round((value + Number.EPSILON) * 100) / 100;
     }
 
+    function formatValue(value) {
+      return Number(value).toFixed(2);
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
     function findColumn(headers, matchers) {
       const normalizedHeaders = headers.map(h => ({
         original: h,
@@ -513,7 +627,7 @@
       return null;
     }
 
-    function detectColumns(headers) {
+    function detectRawColumns(headers) {
       const courseCol = findColumn(headers, [
         h => h.includes("наименование мероприятия"),
         h => h.includes("название мероприятия"),
@@ -545,8 +659,7 @@
         h => h.includes("применимость в работе"),
         h => h.includes("применимость"),
         h => h.includes("полезность в работе"),
-        h => h.includes("полезность"),
-        h => h.includes("применен")
+        h => h.includes("полезность")
       ]);
 
       const clarityCol = findColumn(headers, [
@@ -575,23 +688,67 @@
       };
     }
 
-    function validateColumns(columns, headers) {
-      const missing = [];
+    function detectSummaryColumns(headers) {
+      const directionCol = findColumn(headers, [
+        h => h === "направление",
+        h => h.includes("направление")
+      ]);
 
-      if (!columns.courseCol) missing.push("Не найден столбец с курсом");
-      if (!columns.coordinatorCol) missing.push("Не найден столбец с координатором");
-      if (!columns.recommendCol) missing.push("Не найден столбец 'Рекомендовать'");
-      if (!columns.applicabilityCol) missing.push("Не найден столбец 'Применимость'");
-      if (!columns.clarityCol) missing.push("Не найден столбец 'Понятность'");
-      if (!columns.organizationCol) missing.push("Не найден столбец 'Организация'");
+      const recommendCol = findColumn(headers, [
+        h => h === "рекомендовать",
+        h => h.includes("рекомендовать")
+      ]);
 
-      if (missing.length) {
-        throw new Error(
-          missing.join("\n") +
-          "\n\nНайденные заголовки в файле:\n- " +
-          headers.join("\n- ")
-        );
-      }
+      const applicabilityCol = findColumn(headers, [
+        h => h === "применимость",
+        h => h.includes("применимость")
+      ]);
+
+      const clarityCol = findColumn(headers, [
+        h => h === "понятность",
+        h => h.includes("понятность")
+      ]);
+
+      const organizationCol = findColumn(headers, [
+        h => h === "организация",
+        h => h.includes("организация")
+      ]);
+
+      const totalCol = findColumn(headers, [
+        h => h === "общий nps",
+        h => h.includes("общий nps"),
+        h => h.includes("итоговый nps")
+      ]);
+
+      return {
+        directionCol,
+        recommendCol,
+        applicabilityCol,
+        clarityCol,
+        organizationCol,
+        totalCol
+      };
+    }
+
+    function isRawMode(cols) {
+      return !!(
+        cols.courseCol &&
+        cols.coordinatorCol &&
+        cols.recommendCol &&
+        cols.applicabilityCol &&
+        cols.clarityCol &&
+        cols.organizationCol
+      );
+    }
+
+    function isSummaryMode(cols) {
+      return !!(
+        cols.directionCol &&
+        cols.recommendCol &&
+        cols.applicabilityCol &&
+        cols.clarityCol &&
+        cols.organizationCol
+      );
     }
 
     function renderSummaryTable(data) {
@@ -619,26 +776,12 @@
 
     function renderTopMetrics(totalRow) {
       if (!totalRow) return;
-
       document.getElementById("topMetrics").style.display = "grid";
       document.getElementById("topRec").textContent = formatValue(totalRow["Рекомендовать"]);
       document.getElementById("topUse").textContent = formatValue(totalRow["Применимость"]);
       document.getElementById("topClear").textContent = formatValue(totalRow["Понятность"]);
       document.getElementById("topOrg").textContent = formatValue(totalRow["Организация"]);
       document.getElementById("topTotal").textContent = formatValue(totalRow["Общий NPS"]);
-    }
-
-    function formatValue(value) {
-      return Number(value).toFixed(2);
-    }
-
-    function escapeHtml(text) {
-      return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
     }
 
     function buildChart(totalRow) {
@@ -648,43 +791,24 @@
         chartInstance.destroy();
       }
 
-      const labels = [
-        "Рекомендовать",
-        "Применимость",
-        "Понятность",
-        "Организация"
-      ];
-
-      const values = [
-        totalRow["Рекомендовать"],
-        totalRow["Применимость"],
-        totalRow["Понятность"],
-        totalRow["Организация"]
-      ];
-
       chartInstance = new Chart(ctx, {
         data: {
-          labels,
+          labels: ["Рекомендовать", "Применимость", "Понятность", "Организация"],
           datasets: [
             {
               type: "bar",
               label: "Факт",
-              data: values,
-              backgroundColor: [
-                "rgba(11, 92, 171, 0.82)",
-                "rgba(11, 92, 171, 0.82)",
-                "rgba(11, 92, 171, 0.82)",
-                "rgba(11, 92, 171, 0.82)"
+              data: [
+                totalRow["Рекомендовать"],
+                totalRow["Применимость"],
+                totalRow["Понятность"],
+                totalRow["Организация"]
               ],
-              borderColor: [
-                "rgba(11, 92, 171, 1)",
-                "rgba(11, 92, 171, 1)",
-                "rgba(11, 92, 171, 1)",
-                "rgba(11, 92, 171, 1)"
-              ],
+              backgroundColor: "rgba(13, 122, 142, 0.82)",
+              borderColor: "rgba(10, 92, 115, 1)",
               borderWidth: 1.5,
               borderRadius: 10,
-              maxBarThickness: 88
+              maxBarThickness: 90
             },
             {
               type: "line",
@@ -695,8 +819,8 @@
               borderWidth: 3,
               pointRadius: 0,
               pointHoverRadius: 0,
-              tension: 0,
-              fill: false
+              fill: false,
+              tension: 0
             }
           ]
         },
@@ -730,22 +854,13 @@
               min: 0,
               max: 100,
               ticks: {
-                stepSize: 10,
-                font: {
-                  size: 13
-                }
+                stepSize: 10
               },
               grid: {
                 color: "rgba(148, 163, 184, 0.18)"
               }
             },
             x: {
-              ticks: {
-                font: {
-                  size: 13,
-                  weight: "600"
-                }
-              },
               grid: {
                 display: false
               }
@@ -755,15 +870,173 @@
       });
     }
 
+    function processRawRows(rows, headers) {
+      const columns = detectRawColumns(headers);
+
+      if (!isRawMode(columns)) {
+        throw new Error(
+          "Не удалось распознать сырой файл с курсами.\n\nНайденные заголовки:\n- " +
+          headers.join("\n- ")
+        );
+      }
+
+      const grouped = {};
+
+      rows.forEach(row => {
+        const course = String(row[columns.courseCol] ?? "").trim();
+        const coordinator = String(row[columns.coordinatorCol] ?? "").trim();
+
+        if (!course) return;
+
+        const direction = getDirection(coordinator);
+
+        if (!grouped[direction]) grouped[direction] = {};
+        if (!grouped[direction][course]) {
+          grouped[direction][course] = {
+            rec: [],
+            use: [],
+            clear: [],
+            org: []
+          };
+        }
+
+        grouped[direction][course].rec.push(row[columns.recommendCol]);
+        grouped[direction][course].use.push(row[columns.applicabilityCol]);
+        grouped[direction][course].clear.push(row[columns.clarityCol]);
+        grouped[direction][course].org.push(row[columns.organizationCol]);
+      });
+
+      const directionsResult = [];
+      const coursesResult = [];
+      const totalByDirections = { rec: [], use: [], clear: [], org: [], total: [] };
+
+      Object.keys(grouped).forEach(direction => {
+        const directionMetrics = { rec: [], use: [], clear: [], org: [] };
+
+        Object.keys(grouped[direction]).forEach(course => {
+          const data = grouped[direction][course];
+
+          const rec = round2(calcNPS(data.rec));
+          const use = round2(calcNPS(data.use));
+          const clear = round2(calcNPS(data.clear));
+          const org = round2(calcNPS(data.org));
+          const total = round2(avg([rec, use, clear, org]));
+
+          coursesResult.push({
+            "Направление": direction,
+            "Курс": course,
+            "Рекомендовать": rec,
+            "Применимость": use,
+            "Понятность": clear,
+            "Организация": org,
+            "Общий NPS": total
+          });
+
+          directionMetrics.rec.push(rec);
+          directionMetrics.use.push(use);
+          directionMetrics.clear.push(clear);
+          directionMetrics.org.push(org);
+        });
+
+        const rec = round2(avg(directionMetrics.rec));
+        const use = round2(avg(directionMetrics.use));
+        const clear = round2(avg(directionMetrics.clear));
+        const org = round2(avg(directionMetrics.org));
+        const total = round2(avg([rec, use, clear, org]));
+
+        directionsResult.push({
+          "Направление": direction,
+          "Рекомендовать": rec,
+          "Применимость": use,
+          "Понятность": clear,
+          "Организация": org,
+          "Общий NPS": total
+        });
+
+        totalByDirections.rec.push(rec);
+        totalByDirections.use.push(use);
+        totalByDirections.clear.push(clear);
+        totalByDirections.org.push(org);
+        totalByDirections.total.push(total);
+      });
+
+      const totalRow = {
+        "Направление": "ИТОГО",
+        "Рекомендовать": round2(avg(totalByDirections.rec)),
+        "Применимость": round2(avg(totalByDirections.use)),
+        "Понятность": round2(avg(totalByDirections.clear)),
+        "Организация": round2(avg(totalByDirections.org)),
+        "Общий NPS": round2(avg(totalByDirections.total))
+      };
+
+      directionsResult.push(totalRow);
+
+      return { directionsResult, coursesResult, totalRow };
+    }
+
+    function processSummaryRows(rows, headers) {
+      const columns = detectSummaryColumns(headers);
+
+      if (!isSummaryMode(columns)) {
+        throw new Error(
+          "Не удалось распознать файл как готовую сводку.\n\nНайденные заголовки:\n- " +
+          headers.join("\n- ")
+        );
+      }
+
+      const directionsResult = rows
+        .map(row => {
+          const direction = String(row[columns.directionCol] ?? "").trim();
+          if (!direction) return null;
+
+          const rec = round2(toNumber(row[columns.recommendCol]) ?? 0);
+          const use = round2(toNumber(row[columns.applicabilityCol]) ?? 0);
+          const clear = round2(toNumber(row[columns.clarityCol]) ?? 0);
+          const org = round2(toNumber(row[columns.organizationCol]) ?? 0);
+
+          let total;
+          if (columns.totalCol) {
+            total = round2(toNumber(row[columns.totalCol]) ?? avg([rec, use, clear, org]));
+          } else {
+            total = round2(avg([rec, use, clear, org]));
+          }
+
+          return {
+            "Направление": direction,
+            "Рекомендовать": rec,
+            "Применимость": use,
+            "Понятность": clear,
+            "Организация": org,
+            "Общий NPS": total
+          };
+        })
+        .filter(Boolean);
+
+      const withoutTotal = directionsResult.filter(r => normalizeText(r["Направление"]) !== "итого");
+
+      const totalRow = {
+        "Направление": "ИТОГО",
+        "Рекомендовать": round2(avg(withoutTotal.map(r => r["Рекомендовать"]))),
+        "Применимость": round2(avg(withoutTotal.map(r => r["Применимость"]))),
+        "Понятность": round2(avg(withoutTotal.map(r => r["Понятность"]))),
+        "Организация": round2(avg(withoutTotal.map(r => r["Организация"]))),
+        "Общий NPS": round2(avg(withoutTotal.map(r => r["Общий NPS"])))
+      };
+
+      const finalDirections = [...withoutTotal, totalRow];
+      return { directionsResult: finalDirections, coursesResult: [], totalRow };
+    }
+
     function processFile() {
       try {
         const file = document.getElementById("fileInput").files[0];
         if (!file) {
-          setStatus("Сначала загрузи Excel-файл.", "error");
+          setStatus("Сначала выбери Excel-файл.", "error");
           return;
         }
 
-        setStatus("Читаю файл и считаю показатели...");
+        setStatus("Читаю файл...");
+        setModeBadge("Обработка файла");
 
         const reader = new FileReader();
 
@@ -780,131 +1053,48 @@
             }
 
             const headers = Object.keys(rows[0]);
-            const columns = detectColumns(headers);
-            validateColumns(columns, headers);
+            const rawCols = detectRawColumns(headers);
+            const summaryCols = detectSummaryColumns(headers);
 
-            const grouped = {};
+            let result;
 
-            rows.forEach(row => {
-              const course = String(row[columns.courseCol] ?? "").trim();
-              const coordinator = String(row[columns.coordinatorCol] ?? "").trim();
+            if (isRawMode(rawCols)) {
+              lastMode = "raw";
+              setModeBadge("Режим: сырой файл");
+              result = processRawRows(rows, headers);
+            } else if (isSummaryMode(summaryCols)) {
+              lastMode = "summary";
+              setModeBadge("Режим: готовая сводка");
+              result = processSummaryRows(rows, headers);
+            } else {
+              throw new Error(
+                "Не удалось определить тип файла.\n\n" +
+                "Ожидается либо:\n" +
+                "1) сырой файл с курсом, координатором и 4 оценками,\n" +
+                "либо\n" +
+                "2) готовая сводка с колонками Направление / Рекомендовать / Применимость / Понятность / Организация.\n\n" +
+                "Найденные заголовки:\n- " + headers.join("\n- ")
+              );
+            }
 
-              if (!course) return;
+            lastDirectionsResult = result.directionsResult;
+            lastCoursesResult = result.coursesResult;
 
-              const direction = getDirection(coordinator);
-
-              if (!grouped[direction]) {
-                grouped[direction] = {};
-              }
-
-              if (!grouped[direction][course]) {
-                grouped[direction][course] = {
-                  rec: [],
-                  use: [],
-                  clear: [],
-                  org: []
-                };
-              }
-
-              grouped[direction][course].rec.push(row[columns.recommendCol]);
-              grouped[direction][course].use.push(row[columns.applicabilityCol]);
-              grouped[direction][course].clear.push(row[columns.clarityCol]);
-              grouped[direction][course].org.push(row[columns.organizationCol]);
-            });
-
-            const directionsResult = [];
-            const coursesResult = [];
-
-            const totalByDirections = {
-              rec: [],
-              use: [],
-              clear: [],
-              org: [],
-              total: []
-            };
-
-            Object.keys(grouped).forEach(direction => {
-              const directionMetrics = {
-                rec: [],
-                use: [],
-                clear: [],
-                org: []
-              };
-
-              Object.keys(grouped[direction]).forEach(course => {
-                const data = grouped[direction][course];
-
-                const rec = round2(calcNPS(data.rec));
-                const use = round2(calcNPS(data.use));
-                const clear = round2(calcNPS(data.clear));
-                const org = round2(calcNPS(data.org));
-                const total = round2(avg([rec, use, clear, org]));
-
-                coursesResult.push({
-                  "Направление": direction,
-                  "Курс": course,
-                  "Рекомендовать": rec,
-                  "Применимость": use,
-                  "Понятность": clear,
-                  "Организация": org,
-                  "Общий NPS": total
-                });
-
-                directionMetrics.rec.push(rec);
-                directionMetrics.use.push(use);
-                directionMetrics.clear.push(clear);
-                directionMetrics.org.push(org);
-              });
-
-              const rec = round2(avg(directionMetrics.rec));
-              const use = round2(avg(directionMetrics.use));
-              const clear = round2(avg(directionMetrics.clear));
-              const org = round2(avg(directionMetrics.org));
-              const total = round2(avg([rec, use, clear, org]));
-
-              directionsResult.push({
-                "Направление": direction,
-                "Рекомендовать": rec,
-                "Применимость": use,
-                "Понятность": clear,
-                "Организация": org,
-                "Общий NPS": total
-              });
-
-              totalByDirections.rec.push(rec);
-              totalByDirections.use.push(use);
-              totalByDirections.clear.push(clear);
-              totalByDirections.org.push(org);
-              totalByDirections.total.push(total);
-            });
-
-            const totalRow = {
-              "Направление": "ИТОГО",
-              "Рекомендовать": round2(avg(totalByDirections.rec)),
-              "Применимость": round2(avg(totalByDirections.use)),
-              "Понятность": round2(avg(totalByDirections.clear)),
-              "Организация": round2(avg(totalByDirections.org)),
-              "Общий NPS": round2(avg(totalByDirections.total))
-            };
-
-            directionsResult.push(totalRow);
-
-            lastDirectionsResult = directionsResult;
-            lastCoursesResult = coursesResult;
-
-            renderSummaryTable(directionsResult);
-            renderTopMetrics(totalRow);
-            buildChart(totalRow);
+            renderSummaryTable(result.directionsResult);
+            renderTopMetrics(result.totalRow);
+            buildChart(result.totalRow);
 
             document.getElementById("downloadBtn").disabled = false;
-            setStatus("Готово: таблица увеличена, график построен, Excel можно скачать.", "ok");
+            setStatus("Готово. Файл обработан.", "ok");
           } catch (error) {
             setStatus(error.message || "Ошибка обработки файла.", "error");
+            setModeBadge("Ошибка распознавания");
           }
         };
 
         reader.onerror = function() {
           setStatus("Не удалось прочитать файл.", "error");
+          setModeBadge("Ошибка чтения");
         };
 
         reader.readAsArrayBuffer(file);
@@ -922,13 +1112,15 @@
 
         const wb = XLSX.utils.book_new();
         const ws1 = XLSX.utils.json_to_sheet(lastDirectionsResult);
-        const ws2 = XLSX.utils.json_to_sheet(lastCoursesResult);
-
         XLSX.utils.book_append_sheet(wb, ws1, "Сводка");
-        XLSX.utils.book_append_sheet(wb, ws2, "Курсы");
+
+        if (lastCoursesResult.length) {
+          const ws2 = XLSX.utils.json_to_sheet(lastCoursesResult);
+          XLSX.utils.book_append_sheet(wb, ws2, "Курсы");
+        }
 
         XLSX.writeFile(wb, "NPS_результат.xlsx");
-        setStatus("Excel-файл с результатами скачан.", "ok");
+        setStatus("Excel-файл скачан.", "ok");
       } catch (error) {
         setStatus(error.message || "Не удалось скачать результат.", "error");
       }
