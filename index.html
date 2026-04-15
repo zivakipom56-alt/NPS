@@ -252,6 +252,41 @@
       font-size: 18px;
     }
 
+    .owners-title {
+      margin: 0 0 14px;
+      font-size: 20px;
+      font-weight: 700;
+      color: #102331;
+    }
+
+    .owners-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .owner-card {
+      border: 1px solid #dce6ef;
+      border-radius: 18px;
+      padding: 16px;
+      background: #f8fbfd;
+      min-height: 110px;
+    }
+
+    .owner-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0a5c73;
+      margin-bottom: 8px;
+    }
+
+    .owner-direction {
+      font-size: 14px;
+      line-height: 1.45;
+      color: #334155;
+    }
+
     .top-metrics {
       display: grid;
       grid-template-columns: repeat(5, minmax(160px, 1fr));
@@ -403,13 +438,17 @@
       color: #0f172a;
     }
 
-    @media (max-width: 980px) {
-      .title {
-        font-size: 52px;
+    @media (max-width: 1100px) {
+      .owners-grid {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
       }
 
       .top-metrics {
         grid-template-columns: repeat(2, minmax(160px, 1fr));
+      }
+
+      .title {
+        font-size: 52px;
       }
     }
 
@@ -440,6 +479,7 @@
         min-width: 0;
       }
 
+      .owners-grid,
       .top-metrics {
         grid-template-columns: 1fr;
       }
@@ -464,7 +504,7 @@
 
     <div class="card">
       <h1 class="title">NPS по направлениям</h1>
-      <div class="subtitle">Загрузка Excel и автоматический расчёт или отображение готовой сводки</div>
+      <div class="subtitle">Загрузка Excel и автоматический расчёт по вашим организаторам</div>
 
       <div class="upload-box">
         <div class="upload-box-header">
@@ -501,6 +541,38 @@
       <div class="section-card">
         <h2 class="section-title">Сводка по направлениям</h2>
         <div class="section-subtitle">Средние NPS по направлениям и общий итог по всем направлениям.</div>
+
+        <h3 class="owners-title">Организаторы по направлениям</h3>
+        <div class="owners-grid">
+          <div class="owner-card">
+            <div class="owner-name">Зайнуллин</div>
+            <div class="owner-direction">Механика</div>
+          </div>
+          <div class="owner-card">
+            <div class="owner-name">Бородина</div>
+            <div class="owner-direction">Электротехнические системы</div>
+          </div>
+          <div class="owner-card">
+            <div class="owner-name">Каримова</div>
+            <div class="owner-direction">Технология и производство / Центральные и заводские лаборатории</div>
+          </div>
+          <div class="owner-card">
+            <div class="owner-name">Клюй</div>
+            <div class="owner-direction">Теплоэнергетика / ОЗХ</div>
+          </div>
+          <div class="owner-card">
+            <div class="owner-name">Борисенко</div>
+            <div class="owner-direction">Метрология / АСУТП</div>
+          </div>
+          <div class="owner-card">
+            <div class="owner-name">Александрова</div>
+            <div class="owner-direction">Медицина / Охрана труда</div>
+          </div>
+          <div class="owner-card">
+            <div class="owner-name">Лебедева</div>
+            <div class="owner-direction">Цифровые инструменты для производства / Тех. независимость / Экология</div>
+          </div>
+        </div>
 
         <div class="top-metrics" id="topMetrics" style="display:none;">
           <div class="metric">
@@ -546,8 +618,7 @@
         </div>
 
         <div class="helper">
-          Если загружается сырой файл с курсами и координаторами — приложение само считает NPS.
-          Если загружается уже готовая сводка по направлениям — приложение показывает таблицу и строит сравнительный график.
+          В расчёт попадают только строки по вашим организаторам: Зайнуллин, Бородина, Каримова, Клюй, Борисенко, Александрова, Лебедева. Все остальные строки игнорируются.
         </div>
       </div>
     </div>
@@ -583,8 +654,8 @@
       <p><b>2. Проверьте корректность данных</b></p>
       <ul>
         <li>Если кто-то другой закрыл обучение за вас, сначала исправьте направление вручную</li>
-        <li>Если есть сомнения по направлению, скорректируйте файл перед загрузкой</li>
-        <li>Проверка делается раз в квартал и занимает несколько минут</li>
+        <li>В расчёт идут только строки по вашим организаторам</li>
+        <li>Все остальные строки приложение не показывает</li>
       </ul>
 
       <p><b>3. Загрузите файл</b></p>
@@ -735,11 +806,12 @@
       if (n.includes("механика")) return ["Механика"];
       if (n.includes("электротехнические")) return ["Электротехнические", "системы"];
       if (n.includes("теплоэнергетика")) return ["Теплоэнергетика", "/ ОЗХ"];
+      if (n.includes("технология") && n.includes("производство") && n.includes("лаборат")) return ["Технология / ЦЗЛ"];
       if (n.includes("технология") && n.includes("производство")) return ["Технология и", "производство"];
+      if (n.includes("лаборат")) return ["Центральные", "лаборатории"];
       if (n.includes("цифровые инструменты")) return ["Цифровые", "инструменты"];
       if (n.includes("медицина") && n.includes("охрана труда")) return ["Медицина", "/ ОТ"];
       if (n.includes("метрология") && n.includes("асутп")) return ["Метрология", "/ АСУТП"];
-      if (n.includes("прочее")) return ["Прочее"];
 
       const parts = String(name).split(" ");
       if (parts.length <= 1) return [name];
@@ -811,6 +883,11 @@
     }
 
     function detectRawColumns(headers) {
+      const directionCol = findColumn(headers, [
+        h => h === "направление",
+        h => h.includes("направление")
+      ]);
+
       const courseCol = findColumn(headers, [
         h => h.includes("наименование мероприятия"),
         h => h.includes("название мероприятия"),
@@ -821,10 +898,10 @@
         h => h.includes("мероприят")
       ]);
 
-      const coordinatorCol = findColumn(headers, [
+      const organizerCol = findColumn(headers, [
         h => h.includes("фио координатора"),
         h => h.includes("координатор"),
-        h => h.includes("фио ответственного"),
+        h => h.includes("организатор"),
         h => h.includes("ответственный"),
         h => h.includes("преподаватель")
       ]);
@@ -862,8 +939,9 @@
       ]);
 
       return {
+        directionCol,
         courseCol,
-        coordinatorCol,
+        organizerCol,
         recommendCol,
         applicabilityCol,
         clarityCol,
@@ -916,7 +994,7 @@
     function isRawMode(cols) {
       return !!(
         cols.courseCol &&
-        cols.coordinatorCol &&
+        (cols.directionCol || cols.organizerCol) &&
         cols.recommendCol &&
         cols.applicabilityCol &&
         cols.clarityCol &&
@@ -932,6 +1010,20 @@
         cols.clarityCol &&
         cols.organizationCol
       );
+    }
+
+    function getDirectionByOrganizer(rawOrganizer) {
+      const organizer = normalizeText(rawOrganizer);
+
+      if (organizer.includes("зайнуллин")) return "Механика";
+      if (organizer.includes("бородина")) return "Электротехнические системы";
+      if (organizer.includes("каримова")) return "Технология и производство / Центральные и заводские лаборатории";
+      if (organizer.includes("клюй")) return "Теплоэнергетика / ОЗХ";
+      if (organizer.includes("борисенко")) return "Метрология / АСУТП";
+      if (organizer.includes("александрова")) return "Медицина / Охрана труда";
+      if (organizer.includes("лебедева")) return "Цифровые инструменты для производства / Тех. независимость / Экология";
+
+      return null;
     }
 
     function renderSummaryTable(data) {
@@ -1120,8 +1212,7 @@
 
       if (!isRawMode(columns)) {
         throw new Error(
-          "Не удалось распознать сырой файл с курсами.\n\nНайденные заголовки:\n- " +
-          headers.join("\n- ")
+          "Не удалось распознать сырой файл.\n\nНайденные заголовки:\n- " + headers.join("\n- ")
         );
       }
 
@@ -1131,8 +1222,26 @@
         const course = String(row[columns.courseCol] ?? "").trim();
         if (!course) return;
 
-        if (!grouped[course]) {
-          grouped[course] = {
+        let direction = "";
+        if (columns.directionCol) {
+          direction = String(row[columns.directionCol] ?? "").trim();
+        }
+
+        if (!direction && columns.organizerCol) {
+          direction = getDirectionByOrganizer(row[columns.organizerCol]);
+        }
+
+        // Если направление не определилось по вашим фамилиям — строку полностью пропускаем
+        if (!direction) {
+          return;
+        }
+
+        if (!grouped[direction]) {
+          grouped[direction] = {};
+        }
+
+        if (!grouped[direction][course]) {
+          grouped[direction][course] = {
             rec: [],
             use: [],
             clear: [],
@@ -1140,37 +1249,52 @@
           };
         }
 
-        grouped[course].rec.push(row[columns.recommendCol]);
-        grouped[course].use.push(row[columns.applicabilityCol]);
-        grouped[course].clear.push(row[columns.clarityCol]);
-        grouped[course].org.push(row[columns.organizationCol]);
+        grouped[direction][course].rec.push(row[columns.recommendCol]);
+        grouped[direction][course].use.push(row[columns.applicabilityCol]);
+        grouped[direction][course].clear.push(row[columns.clarityCol]);
+        grouped[direction][course].org.push(row[columns.organizationCol]);
       });
 
       const directionsResult = [];
       const coursesResult = [];
-      const directionMetrics = { rec: [], use: [], clear: [], org: [], total: [] };
+      const totals = { rec: [], use: [], clear: [], org: [], total: [] };
 
-      Object.keys(grouped).forEach(course => {
-        const data = grouped[course];
+      Object.keys(grouped).forEach(direction => {
+        const directionMetrics = { rec: [], use: [], clear: [], org: [] };
 
-        const rec = round2(calcNPS(data.rec));
-        const use = round2(calcNPS(data.use));
-        const clear = round2(calcNPS(data.clear));
-        const org = round2(calcNPS(data.org));
+        Object.keys(grouped[direction]).forEach(course => {
+          const data = grouped[direction][course];
+
+          const rec = round2(calcNPS(data.rec));
+          const use = round2(calcNPS(data.use));
+          const clear = round2(calcNPS(data.clear));
+          const org = round2(calcNPS(data.org));
+          const total = round2(avg([rec, use, clear, org]));
+
+          coursesResult.push({
+            "Направление": direction,
+            "Курс": course,
+            "Рекомендовать": rec,
+            "Применимость": use,
+            "Понятность": clear,
+            "Организация": org,
+            "Общий NPS": total
+          });
+
+          directionMetrics.rec.push(rec);
+          directionMetrics.use.push(use);
+          directionMetrics.clear.push(clear);
+          directionMetrics.org.push(org);
+        });
+
+        const rec = round2(avg(directionMetrics.rec));
+        const use = round2(avg(directionMetrics.use));
+        const clear = round2(avg(directionMetrics.clear));
+        const org = round2(avg(directionMetrics.org));
         const total = round2(avg([rec, use, clear, org]));
 
-        coursesResult.push({
-          "Направление": course,
-          "Курс": course,
-          "Рекомендовать": rec,
-          "Применимость": use,
-          "Понятность": clear,
-          "Организация": org,
-          "Общий NPS": total
-        });
-
         directionsResult.push({
-          "Направление": course,
+          "Направление": direction,
           "Рекомендовать": rec,
           "Применимость": use,
           "Понятность": clear,
@@ -1178,20 +1302,20 @@
           "Общий NPS": total
         });
 
-        directionMetrics.rec.push(rec);
-        directionMetrics.use.push(use);
-        directionMetrics.clear.push(clear);
-        directionMetrics.org.push(org);
-        directionMetrics.total.push(total);
+        totals.rec.push(rec);
+        totals.use.push(use);
+        totals.clear.push(clear);
+        totals.org.push(org);
+        totals.total.push(total);
       });
 
       const totalRow = {
         "Направление": "ИТОГО",
-        "Рекомендовать": round2(avg(directionMetrics.rec)),
-        "Применимость": round2(avg(directionMetrics.use)),
-        "Понятность": round2(avg(directionMetrics.clear)),
-        "Организация": round2(avg(directionMetrics.org)),
-        "Общий NPS": round2(avg(directionMetrics.total))
+        "Рекомендовать": round2(avg(totals.rec)),
+        "Применимость": round2(avg(totals.use)),
+        "Понятность": round2(avg(totals.clear)),
+        "Организация": round2(avg(totals.org)),
+        "Общий NPS": round2(avg(totals.total))
       };
 
       directionsResult.push(totalRow);
@@ -1204,15 +1328,28 @@
 
       if (!isSummaryMode(columns)) {
         throw new Error(
-          "Не удалось распознать файл как готовую сводку.\n\nНайденные заголовки:\n- " +
-          headers.join("\n- ")
+          "Не удалось распознать файл как готовую сводку.\n\nНайденные заголовки:\n- " + headers.join("\n- ")
         );
       }
+
+      const allowedDirections = [
+        "Механика",
+        "Электротехнические системы",
+        "Технология и производство / Центральные и заводские лаборатории",
+        "Теплоэнергетика / ОЗХ",
+        "Метрология / АСУТП",
+        "Медицина / Охрана труда",
+        "Цифровые инструменты для производства / Тех. независимость / Экология"
+      ].map(normalizeText);
 
       const directionsResult = rows
         .map(row => {
           const direction = String(row[columns.directionCol] ?? "").trim();
           if (!direction) return null;
+
+          if (!allowedDirections.includes(normalizeText(direction)) && normalizeText(direction) !== "итого") {
+            return null;
+          }
 
           const rec = round2(toNumber(row[columns.recommendCol]) ?? 0);
           const use = round2(toNumber(row[columns.applicabilityCol]) ?? 0);
@@ -1293,11 +1430,15 @@
               throw new Error(
                 "Не удалось определить тип файла.\n\n" +
                 "Ожидается либо:\n" +
-                "1) сырой файл с курсом, координатором и 4 оценками,\n" +
-                "либо\n" +
-                "2) готовая сводка с колонками Направление / Рекомендовать / Применимость / Понятность / Организация.\n\n" +
+                "1) сырой файл с курсом и 4 оценками,\n" +
+                "2) сырой файл с курсом, организатором и 4 оценками,\n" +
+                "3) готовая сводка с колонками Направление / Рекомендовать / Применимость / Понятность / Организация.\n\n" +
                 "Найденные заголовки:\n- " + headers.join("\n- ")
               );
+            }
+
+            if (!result.directionsResult.length || (result.directionsResult.length === 1 && result.directionsResult[0]["Направление"] === "ИТОГО")) {
+              throw new Error("В файле не найдено строк по вашим организаторам. Проверьте фамилии или внесите правки вручную перед загрузкой.");
             }
 
             lastDirectionsResult = result.directionsResult;
