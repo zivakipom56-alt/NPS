@@ -3,881 +3,936 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Excel → PPTX</title>
+  <title>NPS по направлениям</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
-    :root {
-      --bg: #f4f7f8;
-      --card: rgba(255, 255, 255, 0.9);
-      --text: #19353c;
-      --muted: #61767b;
-      --line: rgba(15, 94, 102, 0.12);
-      --brand: #0b8f9a;
-      --brand-dark: #0b5860;
-      --brand-soft: rgba(11, 143, 154, 0.08);
-      --success: #146c43;
-      --success-bg: #f1fbf5;
-      --success-line: #cbe8d7;
-      --error: #b34747;
-      --error-bg: #fff6f6;
-      --error-line: #f0cccc;
-      --shadow: 0 18px 40px rgba(18, 55, 62, 0.08);
-      --radius-xl: 28px;
-    }
-
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      font-family: Inter, Arial, Helvetica, sans-serif;
-      color: var(--text);
-      background:
-        radial-gradient(circle at top right, rgba(11, 143, 154, 0.08), transparent 24%),
-        radial-gradient(circle at left top, rgba(11, 88, 96, 0.06), transparent 22%),
-        linear-gradient(180deg, #f7fbfc 0%, #f2f6f7 100%);
+    * {
+      box-sizing: border-box;
     }
 
     body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 28px 16px;
-    }
-
-    .shell {
-      width: 100%;
-      max-width: 880px;
-    }
-
-    .logo-wrap {
-      display: flex;
-      justify-content: center;
-      margin-bottom: 18px;
-    }
-
-    .logo {
-      width: 132px;
-      height: auto;
-      display: block;
-      object-fit: contain;
-    }
-
-    .card {
-      background: var(--card);
-      border: 1px solid var(--line);
-      border-radius: var(--radius-xl);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-      padding: 34px 32px 28px;
-    }
-
-    .hero {
-      text-align: center;
-      margin-bottom: 26px;
-    }
-
-    .title {
       margin: 0;
-      font-size: clamp(34px, 5vw, 52px);
-      line-height: 0.98;
-      letter-spacing: -0.035em;
-      font-weight: 800;
-      color: var(--text);
+      font-family: Arial, sans-serif;
+      background: #f4f7fb;
+      color: #1f2937;
     }
 
-    .subtitle {
-      margin: 12px auto 0;
-      max-width: 540px;
-      font-size: 16px;
-      line-height: 1.5;
-      color: var(--muted);
+    .page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 24px 40px;
     }
 
-    .panel {
-      border: 1px solid rgba(15, 94, 102, 0.10);
-      border-radius: 24px;
-      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(245,249,250,.92));
-      padding: 20px;
+    .header {
+      background: linear-gradient(135deg, #0b5cab, #1570d1);
+      color: white;
+      border-radius: 20px;
+      padding: 28px 32px;
+      margin-bottom: 24px;
+      box-shadow: 0 12px 30px rgba(21, 112, 209, 0.22);
     }
 
-    .panel-top {
+    .header h1 {
+      margin: 0 0 10px;
+      font-size: 36px;
+      line-height: 1.1;
+    }
+
+    .header p {
+      margin: 0;
+      font-size: 17px;
+      opacity: 0.95;
+    }
+
+    .controls {
       display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
       align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      margin-bottom: 14px;
+      margin: 22px 0 18px;
     }
 
-    .panel-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .panel-badge {
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--brand-dark);
-      background: var(--brand-soft);
-      border: 1px solid rgba(11, 143, 154, 0.14);
-      border-radius: 999px;
-      padding: 9px 12px;
-      white-space: nowrap;
-    }
-
-    .file-input {
-      width: 100%;
-      display: block;
-      border: 1px solid rgba(15, 94, 102, 0.14);
-      border-radius: 16px;
-      padding: 14px;
-      background: #fff;
-      color: var(--text);
-      margin-bottom: 14px;
-    }
-
-    .actions {
-      display: flex;
+    .file-label {
+      display: inline-flex;
+      align-items: center;
       justify-content: center;
+      min-height: 48px;
+      padding: 0 18px;
+      background: white;
+      border: 1px solid #d8e1ee;
+      border-radius: 12px;
+      font-size: 15px;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    }
+
+    .file-label input {
+      display: none;
     }
 
     .btn {
-      appearance: none;
-      border: 0;
-      border-radius: 16px;
-      padding: 15px 24px;
+      min-height: 48px;
+      padding: 0 20px;
+      border: none;
+      border-radius: 12px;
+      background: #0b5cab;
+      color: white;
       font-size: 15px;
-      font-weight: 800;
+      font-weight: 600;
       cursor: pointer;
-      transition: transform .15s ease, opacity .15s ease, box-shadow .15s ease;
-      min-width: 240px;
-      color: #fff;
-      background: linear-gradient(135deg, #0b7d88, #0b5760);
-      box-shadow: 0 14px 28px rgba(11, 88, 96, 0.18);
+      box-shadow: 0 10px 24px rgba(11, 92, 171, 0.22);
     }
 
     .btn:hover {
-      transform: translateY(-1px);
+      opacity: 0.95;
     }
 
-    .btn:disabled {
-      opacity: .6;
-      cursor: not-allowed;
-      transform: none;
+    .btn.secondary {
+      background: #ffffff;
+      color: #0b5cab;
+      border: 1px solid #c9d8ea;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.05);
+    }
+
+    .filename {
+      font-size: 14px;
+      color: #4b5563;
     }
 
     .status {
-      margin-top: 16px;
-      padding: 14px 16px;
-      border-radius: 16px;
-      background: #f7fbfc;
-      border: 1px solid var(--line);
-      color: var(--text);
-      white-space: pre-wrap;
+      margin-top: 8px;
+      min-height: 24px;
+      font-size: 15px;
       line-height: 1.45;
-      font-size: 14px;
-      text-align: center;
     }
 
-    .status.success {
-      color: var(--success);
-      background: var(--success-bg);
-      border-color: var(--success-line);
+    .status.ok {
+      color: #047857;
     }
 
     .status.error {
-      color: var(--error);
-      background: var(--error-bg);
-      border-color: var(--error-line);
+      color: #b91c1c;
+      white-space: pre-wrap;
+      background: #fff1f2;
+      border: 1px solid #fecdd3;
+      border-radius: 12px;
+      padding: 12px 14px;
     }
 
-    @media (max-width: 640px) {
-      body {
-        padding: 18px 12px;
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin: 24px 0 20px;
+      flex-wrap: wrap;
+    }
+
+    .tab-btn {
+      border: none;
+      background: white;
+      color: #334155;
+      border-radius: 12px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid #d8e1ee;
+      box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    }
+
+    .tab-btn.active {
+      background: #0b5cab;
+      color: white;
+      border-color: #0b5cab;
+    }
+
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+      border: 1px solid #e7edf5;
+    }
+
+    .card h2 {
+      margin: 0 0 8px;
+      font-size: 24px;
+    }
+
+    .card p {
+      margin: 0 0 18px;
+      color: #5b6472;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(180px, 1fr));
+      gap: 14px;
+      margin-bottom: 22px;
+    }
+
+    .metric-box {
+      background: #f8fbff;
+      border: 1px solid #dce8f6;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .metric-box .label {
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 8px;
+    }
+
+    .metric-box .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .table-wrap {
+      width: 100%;
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid #dfe7f1;
+    }
+
+    table {
+      width: 100%;
+      min-width: 1100px;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    thead th {
+      background: #0b5cab;
+      color: white;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 16px 14px;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 15px 14px;
+      border-top: 1px solid #e8eef5;
+      font-size: 15px;
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #fbfdff;
+    }
+
+    tbody tr.total-row {
+      background: #fff9db;
+      font-weight: 700;
+    }
+
+    tbody td:first-child,
+    thead th:first-child {
+      text-align: left;
+      min-width: 280px;
+    }
+
+    .chart-card {
+      padding-bottom: 28px;
+    }
+
+    .chart-wrap {
+      position: relative;
+      width: 100%;
+      min-height: 520px;
+    }
+
+    #metricsChart {
+      width: 100% !important;
+      height: 520px !important;
+    }
+
+    .legend-note {
+      margin-top: 16px;
+      font-size: 14px;
+      color: #5b6472;
+    }
+
+    .helper {
+      margin-top: 18px;
+      padding: 16px;
+      background: #f9fbfe;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.55;
+      color: #475569;
+    }
+
+    @media (max-width: 1100px) {
+      .summary-grid {
+        grid-template-columns: repeat(2, minmax(180px, 1fr));
+      }
+    }
+
+    @media (max-width: 700px) {
+      .page {
+        padding: 18px 14px 28px;
       }
 
-      .card {
-        padding: 24px 18px 20px;
-        border-radius: 22px;
+      .header h1 {
+        font-size: 28px;
       }
 
-      .panel {
-        padding: 16px;
-        border-radius: 18px;
+      .summary-grid {
+        grid-template-columns: 1fr;
       }
 
-      .panel-top {
+      .controls {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: stretch;
       }
 
-      .btn {
+      .btn, .file-label {
         width: 100%;
-      }
-
-      .logo {
-        width: 116px;
       }
     }
   </style>
 </head>
 <body>
-  <div class="shell">
-    <div class="logo-wrap">
-      <img class="logo" src="./sibur-logo.png" alt="Логотип" />
+  <div class="page">
+    <div class="header">
+      <h1>NPS по направлениям</h1>
+      <p>Загрузи Excel, приложение само распознает нужные столбцы, посчитает NPS и построит график.</p>
     </div>
 
-    <div class="card">
-      <div class="hero">
-        <h1 class="title">Excel → PPTX</h1>
-        <div class="subtitle">Загрузка графика и генерация презентации</div>
+    <div class="controls">
+      <label class="file-label">
+        <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" />
+        Выбрать Excel-файл
+      </label>
+
+      <button class="btn" onclick="processFile()">Рассчитать</button>
+      <button class="btn secondary" onclick="downloadResult()" id="downloadBtn" disabled>Скачать Excel</button>
+
+      <div class="filename" id="fileName">Файл не выбран</div>
+    </div>
+
+    <div id="status" class="status"></div>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('summaryTab', this)">Страница 1 — Сводка</button>
+      <button class="tab-btn" onclick="showTab('chartTab', this)">Страница 2 — График</button>
+    </div>
+
+    <div id="summaryTab" class="panel active">
+      <div class="card">
+        <h2>Сводка по направлениям</h2>
+        <p>Средние NPS по направлениям и общий итог по всем направлениям.</p>
+
+        <div class="summary-grid" id="topMetrics" style="display:none;">
+          <div class="metric-box">
+            <div class="label">Рекомендовать</div>
+            <div class="value" id="topRec">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="label">Применимость</div>
+            <div class="value" id="topUse">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="label">Понятность</div>
+            <div class="value" id="topClear">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="label">Организация</div>
+            <div class="value" id="topOrg">0</div>
+          </div>
+          <div class="metric-box">
+            <div class="label">Общий NPS</div>
+            <div class="value" id="topTotal">0</div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table id="summaryTable">
+            <thead>
+              <tr>
+                <th>Направление</th>
+                <th>Рекомендовать</th>
+                <th>Применимость</th>
+                <th>Понятность</th>
+                <th>Организация</th>
+                <th>Общий NPS</th>
+              </tr>
+            </thead>
+            <tbody id="summaryTableBody">
+              <tr>
+                <td colspan="6">Здесь появится таблица после загрузки файла.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="helper">
+          На первой странице таблица сделана шире и крупнее. Внизу итоговая строка <strong>ИТОГО</strong> — это среднее по всем направлениям.
+        </div>
       </div>
+    </div>
 
-      <div class="panel">
-        <div class="panel-top">
-          <div class="panel-title">Выберите файл</div>
-          <div class="panel-badge">Нижнекамск • Пн–Пт</div>
+    <div id="chartTab" class="panel">
+      <div class="card chart-card">
+        <h2>График по 4 метрикам</h2>
+        <p>Порог 80% отмечен жёлтой линией. Синие столбцы показывают итоговые значения по всем направлениям.</p>
+
+        <div class="chart-wrap">
+          <canvas id="metricsChart"></canvas>
         </div>
 
-        <input class="file-input" id="excelFile" type="file" accept=".xlsx,.xls,.xlsm" />
-
-        <div class="actions">
-          <button class="btn" id="generateBtn">Сгенерировать PPTX</button>
+        <div class="legend-note">
+          Жёлтая линия — целевой порог 80%.
         </div>
-
-        <div id="status" class="status">Ожидаю Excel-файл.</div>
       </div>
     </div>
   </div>
 
-  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/gitbrent/pptxgenjs/dist/pptxgen.bundle.js"></script>
-
   <script>
-    const statusEl = document.getElementById('status');
-    const fileInput = document.getElementById('excelFile');
-    const generateBtn = document.getElementById('generateBtn');
+    const directionMap = {
+      "Зайнуллин": "Механика",
+      "Бородина": "Электротехнические системы",
+      "Каримова": "Технология и производство / Центральные и заводские лаборатории",
+      "Клюй": "Теплоэнергетика / ОЗХ",
+      "Борисенко": "Метрология / АСУТП",
+      "Александрова": "Медицина / Охрана труда",
+      "Лебедева": "Цифровые инструменты для производства / Тех. независимость / Экология"
+    };
 
-    const RU_MONTHS = [
-      'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-      'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
-    ];
+    let chartInstance = null;
+    let lastDirectionsResult = [];
+    let lastCoursesResult = [];
 
-    function setStatus(message, type = '') {
-      statusEl.textContent = message;
-      statusEl.className = 'status' + (type ? ' ' + type : '');
+    document.getElementById("fileInput").addEventListener("change", function() {
+      const file = this.files[0];
+      document.getElementById("fileName").textContent = file ? file.name : "Файл не выбран";
+    });
+
+    function showTab(tabId, button) {
+      document.querySelectorAll(".panel").forEach(panel => {
+        panel.classList.remove("active");
+      });
+
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.remove("active");
+      });
+
+      document.getElementById(tabId).classList.add("active");
+      button.classList.add("active");
+    }
+
+    function setStatus(message, type = "") {
+      const el = document.getElementById("status");
+      el.className = "status " + type;
+      el.textContent = message;
     }
 
     function normalizeText(value) {
-      return String(value ?? '')
-        .replace(/\u00A0/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .toLowerCase();
-    }
-
-    function cleanText(value) {
-      return String(value ?? '')
-        .replace(/\u00A0/g, ' ')
-        .replace(/\s+/g, ' ')
+      return String(value ?? "")
+        .toLowerCase()
+        .replace(/ё/g, "е")
+        .replace(/\s+/g, " ")
         .trim();
     }
 
-    function excelDateToJS(value) {
-      if (value instanceof Date && !Number.isNaN(value)) {
-        return new Date(value.getFullYear(), value.getMonth(), value.getDate());
-      }
-
-      if (typeof value === 'number') {
-        const parsed = XLSX.SSF.parse_date_code(value);
-        if (!parsed) return null;
-        return new Date(parsed.y, parsed.m - 1, parsed.d);
-      }
-
-      if (typeof value === 'string' && value.trim()) {
-        const str = value.trim();
-        const m = str.match(/^(\d{1,2})[.\-\/](\d{1,2})[.\-\/](\d{2,4})$/);
-        if (m) {
-          let year = Number(m[3]);
-          if (year < 100) year += 2000;
-          return new Date(year, Number(m[2]) - 1, Number(m[1]));
+    function getDirection(name) {
+      const fullName = String(name ?? "");
+      for (const key of Object.keys(directionMap)) {
+        if (fullName.includes(key)) {
+          return directionMap[key];
         }
+      }
+      return "Прочее";
+    }
 
-        const d = new Date(str);
-        if (!Number.isNaN(d)) {
-          return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-        }
+    function toNumber(value) {
+      if (value === null || value === undefined || value === "") return null;
+      if (typeof value === "number" && Number.isFinite(value)) return value;
+
+      const prepared = String(value).replace(",", ".").trim();
+      const num = Number(prepared);
+      return Number.isFinite(num) ? num : null;
+    }
+
+    function calcNPS(values) {
+      const validValues = values
+        .map(toNumber)
+        .filter(v => v !== null && v >= 0 && v <= 10);
+
+      if (!validValues.length) return 0;
+
+      let promoters = 0;
+      let detractors = 0;
+
+      validValues.forEach(v => {
+        if (v >= 9) promoters++;
+        else if (v <= 6) detractors++;
+      });
+
+      return ((promoters / validValues.length) - (detractors / validValues.length)) * 100;
+    }
+
+    function avg(arr) {
+      const valid = arr.filter(v => typeof v === "number" && Number.isFinite(v));
+      if (!valid.length) return 0;
+      return valid.reduce((sum, v) => sum + v, 0) / valid.length;
+    }
+
+    function round2(value) {
+      return Math.round((value + Number.EPSILON) * 100) / 100;
+    }
+
+    function findColumn(headers, matchers) {
+      const normalizedHeaders = headers.map(h => ({
+        original: h,
+        normalized: normalizeText(h)
+      }));
+
+      for (const matcher of matchers) {
+        const found = normalizedHeaders.find(h => matcher(h.normalized));
+        if (found) return found.original;
       }
 
       return null;
     }
 
-    function cloneDate(d) {
-      return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    }
-
-    function addDays(date, days) {
-      const d = cloneDate(date);
-      d.setDate(d.getDate() + days);
-      return d;
-    }
-
-    function startOfWeekMonday(date) {
-      const d = cloneDate(date);
-      const day = d.getDay();
-      const diff = day === 0 ? -6 : 1 - day;
-      return addDays(d, diff);
-    }
-
-    function formatDateShort(date) {
-      return `${String(date.getDate()).padStart(2, '0')}.${String(date.getMonth() + 1).padStart(2, '0')}`;
-    }
-
-    function formatSlideDate(date) {
-      return `${date.getDate()} ${RU_MONTHS[date.getMonth()]} ${date.getFullYear()} года`;
-    }
-
-    function parseWeekFromFilename(filename, availableYears = []) {
-      const normalized = filename.replace(/_/g, '.');
-      const match = normalized.match(/(\d{2})\.(\d{2}).*?(\d{2})\.(\d{2})/);
-
-      if (!match) return null;
-
-      const d1 = Number(match[1]);
-      const m1 = Number(match[2]);
-      const d2 = Number(match[3]);
-      const m2 = Number(match[4]);
-      const year = availableYears.length ? Math.max(...availableYears) : new Date().getFullYear();
-
-      const start = new Date(year, m1 - 1, d1);
-      const endYear = m2 < m1 ? year + 1 : year;
-      const end = new Date(endYear, m2 - 1, d2);
-
-      if (Number.isNaN(start) || Number.isNaN(end)) return null;
-      return { start, end };
-    }
-
-    function detectHeaderRow(rows) {
-      return rows.findIndex(row => {
-        const normalized = row.map(normalizeText);
-        return normalized.includes('название мероприятия') &&
-               normalized.includes('дата начала') &&
-               normalized.includes('дата завершения');
-      });
-    }
-
-    function buildHeaderMap(headerRow) {
-      const findIndex = predicate => headerRow.findIndex((name, idx) => predicate(normalizeText(name), idx));
-
-      const placeIndexes = headerRow
-        .map((name, idx) => ({ idx, key: normalizeText(name) }))
-        .filter(item => item.key === 'место проведения')
-        .map(item => item.idx);
-
-      return {
-        placeCandidates: placeIndexes,
-        course: findIndex(name => name === 'название мероприятия'),
-        start: findIndex(name => name === 'дата начала'),
-        end: findIndex(name => name === 'дата завершения'),
-        trainer: findIndex(name => name.includes('кт/сопровождающий'))
-      };
-    }
-
-    function chooseBestPlaceColumn(rows, startRowIndex, candidateIndexes) {
-      if (!candidateIndexes || !candidateIndexes.length) return -1;
-      if (candidateIndexes.length === 1) return candidateIndexes[0];
-
-      const scoreColumn = (colIdx) => {
-        let score = 0;
-
-        for (let r = startRowIndex; r < Math.min(rows.length, startRowIndex + 500); r++) {
-          const value = cleanText(rows[r]?.[colIdx]);
-          if (!value) continue;
-
-          const lowered = value.toLowerCase();
-
-          if (lowered.includes('нижнекамск')) score += 1;
-          if (lowered.includes('сибуринтех')) score += 1;
-          if (lowered.includes('полигоны')) score += 6;
-          if (/\b\d\.\d{1,2}\b/.test(value)) score += 6;
-        }
-
-        return score;
-      };
-
-      let bestIdx = candidateIndexes[0];
-      let bestScore = -1;
-
-      for (const idx of candidateIndexes) {
-        const score = scoreColumn(idx);
-        if (score > bestScore) {
-          bestScore = score;
-          bestIdx = idx;
-        }
-      }
-
-      if (bestScore <= 0) {
-        return candidateIndexes.includes(6) ? 6 : candidateIndexes[0];
-      }
-
-      return bestIdx;
-    }
-
-    function detectBestWeek(courses) {
-      const minDate = courses.reduce((min, c) => c.start < min ? c.start : min, courses[0].start);
-      const maxDate = courses.reduce((max, c) => c.end > max ? c.end : max, courses[0].end);
-
-      let current = startOfWeekMonday(addDays(minDate, -7));
-      const finish = addDays(maxDate, 7);
-
-      let best = { score: -1, start: current, end: addDays(current, 4) };
-
-      while (current <= finish) {
-        let score = 0;
-        for (let i = 0; i < 5; i++) {
-          const day = addDays(current, i);
-          score += courses.filter(c => c.start <= day && c.end >= day).length;
-        }
-
-        if (score > best.score) {
-          best = { score, start: current, end: addDays(current, 4) };
-        }
-
-        current = addDays(current, 7);
-      }
-
-      return best;
-    }
-
-    function extractFirstTrainerName(value) {
-      const raw = String(value ?? '')
-        .replace(/\u00A0/g, ' ')
-        .replace(/\r/g, '\n')
-        .trim();
-
-      if (!raw) return '';
-
-      const firstChunk = raw
-        .split(/\n|,/)
-        .map(s => s.trim())
-        .filter(Boolean)[0] || '';
-
-      if (!firstChunk) return '';
-
-      const parts = firstChunk.split(/\s+/).filter(Boolean);
-
-      if (parts.length >= 2) {
-        const surname = parts[0];
-        const name = parts[1];
-        return `${name} ${surname}`;
-      }
-
-      return firstChunk;
-    }
-
-    function extractRoomAndFloor(place) {
-      const text = cleanText(place);
-      if (!text) return { room: '', floor: '' };
-
-      const lowered = text.toLowerCase();
-
-      if (lowered.includes('полигоны')) {
-        return { room: 'Полигоны', floor: '' };
-      }
-
-      const roomMatch = text.match(/\b(\d\.\d{1,2})\b/);
-      if (roomMatch) {
-        const room = roomMatch[1];
-        return { room, floor: room.charAt(0) };
-      }
-
-      return { room: '', floor: '' };
-    }
-
-    function compareRoomValues(a, b) {
-      const roomA = cleanText(a.room);
-      const roomB = cleanText(b.room);
-
-      const isEmptyA = !roomA;
-      const isEmptyB = !roomB;
-      const isPolyA = normalizeText(roomA) === 'полигоны';
-      const isPolyB = normalizeText(roomB) === 'полигоны';
-
-      if (isEmptyA && !isEmptyB) return 1;
-      if (!isEmptyA && isEmptyB) return -1;
-
-      if (isPolyA && !isPolyB) return 1;
-      if (!isPolyA && isPolyB) return -1;
-
-      if (isPolyA && isPolyB) {
-        return a.course.localeCompare(b.course, 'ru');
-      }
-
-      if (isEmptyA && isEmptyB) {
-        return a.course.localeCompare(b.course, 'ru');
-      }
-
-      const matchA = roomA.match(/^(\d)\.(\d{1,2})$/);
-      const matchB = roomB.match(/^(\d)\.(\d{1,2})$/);
-
-      if (matchA && matchB) {
-        const floorA = Number(matchA[1]);
-        const floorB = Number(matchB[1]);
-        if (floorA !== floorB) return floorA - floorB;
-
-        const numA = Number(matchA[2]);
-        const numB = Number(matchB[2]);
-        if (numA !== numB) return numA - numB;
-      }
-
-      return roomA.localeCompare(roomB, 'ru') || a.course.localeCompare(b.course, 'ru');
-    }
-
-    function buildDayCourses(courses, day) {
-      return courses
-        .filter(c => c.start <= day && c.end >= day)
-        .sort(compareRoomValues);
-    }
-
-    function extractCourses(workbook, fileName) {
-      const sheetName = workbook.SheetNames.includes('Источник') ? 'Источник' : workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, raw: true, defval: '' });
-
-      const headerIndex = detectHeaderRow(rows);
-      if (headerIndex === -1) {
-        throw new Error('Не удалось найти строку заголовков на листе «Источник».');
-      }
-
-      const header = rows[headerIndex].map(cleanText);
-      const map = buildHeaderMap(header);
-      const placeColumnIndex = chooseBestPlaceColumn(rows, headerIndex + 1, map.placeCandidates);
-
-      if ([placeColumnIndex, map.course, map.start, map.end, map.trainer].some(v => v === -1)) {
-        throw new Error('Не удалось определить нужные столбцы в Excel.');
-      }
-
-      const allDataRows = rows.slice(headerIndex + 1);
-      const courses = [];
-
-      for (const row of allDataRows) {
-        const placeRaw = cleanText(row[placeColumnIndex]);
-        if (!placeRaw) continue;
-        if (!normalizeText(placeRaw).includes('нижнекамск')) continue;
-
-        const course = cleanText(row[map.course]);
-        const trainer = cleanText(row[map.trainer]);
-        const start = excelDateToJS(row[map.start]);
-        const end = excelDateToJS(row[map.end]);
-
-        if (!course || !start || !end) continue;
-
-        const placeInfo = extractRoomAndFloor(placeRaw);
-
-        courses.push({
-          place: placeRaw,
-          course,
-          trainer,
-          start,
-          end: end < start ? start : end,
-          room: placeInfo.room,
-          floor: placeInfo.floor
-        });
-      }
-
-      if (!courses.length) {
-        throw new Error('В файле не найдено ни одной строки по Нижнекамску.');
-      }
-
-      const years = [...new Set(courses.flatMap(c => [c.start.getFullYear(), c.end.getFullYear()]))];
-      let week = parseWeekFromFilename(fileName, years);
-      if (!week) week = detectBestWeek(courses);
-
-      const monday = startOfWeekMonday(week.start);
-      const days = Array.from({ length: 5 }, (_, i) => addDays(monday, i));
-
-      return { courses, days };
-    }
-
-    function addTemplateChrome(slide, day) {
-      slide.background = { color: 'FFFFFF' };
-
-      slide.addShape('rect', {
-        x: 1.55,
-        y: 0.22,
-        w: 10.0,
-        h: 0.36,
-        fill: { color: '0B7E88' },
-        line: { color: '0B7E88', transparency: 100 }
-      });
-
-      slide.addText('Расписание обучений', {
-        x: 4.0,
-        y: 0.26,
-        w: 5.1,
-        h: 0.22,
-        align: 'center',
-        fontFace: 'Arial',
-        fontSize: 18,
-        bold: true,
-        color: 'FFFFFF',
-        margin: 0
-      });
-
-      slide.addShape('rect', {
-        x: 0.22,
-        y: 0.58,
-        w: 12.83,
-        h: 0.3,
-        fill: { color: '0A98A4' },
-        line: { color: '0A98A4', transparency: 100 }
-      });
-
-      slide.addText(formatSlideDate(day), {
-        x: 4.05,
-        y: 0.62,
-        w: 5.0,
-        h: 0.18,
-        align: 'center',
-        fontFace: 'Arial',
-        fontSize: 13,
-        bold: true,
-        color: 'FFFFFF',
-        margin: 0
-      });
-
-      slide.addShape('line', {
-        x: 0.2,
-        y: 0.89,
-        w: 13.05,
-        h: 0,
-        line: { color: '111111', width: 1.1 }
-      });
-    }
-
-    function buildTableRows(dayCourses, visibleRows) {
-      const headerFill = 'A9C8CD';
-      const headerFont = 'FFFFFF';
-      const bodyFill = 'FFFFFF';
-      const grid = '9CC6CC';
-      const textColor = '111111';
-
-      const rows = [];
-
-      rows.push([
-        { text: 'Время\nначала', options: {
-          bold: false, fontFace: 'Arial', fontSize: 10, color: headerFont,
-          fill: headerFill, align: 'center', valign: 'mid',
-          border: { type: 'solid', color: 'FFFFFF', pt: 1 }
-        }},
-        { text: 'Время\nокончания', options: {
-          bold: false, fontFace: 'Arial', fontSize: 10, color: headerFont,
-          fill: headerFill, align: 'center', valign: 'mid',
-          border: { type: 'solid', color: 'FFFFFF', pt: 1 }
-        }},
-        { text: 'Программа обучения', options: {
-          bold: false, fontFace: 'Arial', fontSize: 10, color: headerFont,
-          fill: headerFill, align: 'center', valign: 'mid',
-          border: { type: 'solid', color: 'FFFFFF', pt: 1 }
-        }},
-        { text: 'Преподаватель', options: {
-          bold: false, fontFace: 'Arial', fontSize: 10, color: headerFont,
-          fill: headerFill, align: 'center', valign: 'mid',
-          border: { type: 'solid', color: 'FFFFFF', pt: 1 }
-        }},
-        { text: 'Этаж', options: {
-          bold: false, fontFace: 'Arial', fontSize: 10, color: headerFont,
-          fill: headerFill, align: 'center', valign: 'mid',
-          border: { type: 'solid', color: 'FFFFFF', pt: 1 }
-        }},
-        { text: 'Аудитория', options: {
-          bold: false, fontFace: 'Arial', fontSize: 10, color: headerFont,
-          fill: headerFill, align: 'center', valign: 'mid',
-          border: { type: 'solid', color: 'FFFFFF', pt: 1 }
-        }}
+    function detectColumns(headers) {
+      const courseCol = findColumn(headers, [
+        h => h.includes("наименование мероприятия"),
+        h => h.includes("название мероприятия"),
+        h => h.includes("наименование курса"),
+        h => h.includes("название курса"),
+        h => h === "курс",
+        h => h.includes("курс"),
+        h => h.includes("мероприят")
       ]);
 
-      for (let i = 0; i < visibleRows; i++) {
-        const course = dayCourses[i];
+      const coordinatorCol = findColumn(headers, [
+        h => h.includes("фио координатора"),
+        h => h.includes("координатор"),
+        h => h.includes("фио ответственного"),
+        h => h.includes("ответственный"),
+        h => h.includes("преподаватель")
+      ]);
 
-        rows.push([
-          { text: course ? '08:00' : '', options: {
-            fontFace: 'Arial', fontSize: 10.6, color: textColor,
-            fill: bodyFill, align: 'center', valign: 'mid',
-            border: { type: 'solid', color: grid, pt: 0.8 }, margin: 0.02
-          }},
-          { text: course ? '17:00' : '', options: {
-            fontFace: 'Arial', fontSize: 10.6, color: textColor,
-            fill: bodyFill, align: 'center', valign: 'mid',
-            border: { type: 'solid', color: grid, pt: 0.8 }, margin: 0.02
-          }},
-          { text: course ? course.course : '', options: {
-            fontFace: 'Arial', fontSize: 10.6, color: textColor,
-            fill: bodyFill, align: 'left', valign: 'mid',
-            border: { type: 'solid', color: grid, pt: 0.8 }, margin: 0.03,
-            fit: 'shrink'
-          }},
-          { text: course ? extractFirstTrainerName(course.trainer) : '', options: {
-            fontFace: 'Arial', fontSize: 10.6, color: textColor,
-            fill: bodyFill, align: 'left', valign: 'mid',
-            border: { type: 'solid', color: grid, pt: 0.8 }, margin: 0.03,
-            fit: 'shrink'
-          }},
-          { text: course ? (course.floor || '') : '', options: {
-            fontFace: 'Arial', fontSize: 10.6, color: textColor,
-            fill: bodyFill, align: 'center', valign: 'mid',
-            border: { type: 'solid', color: grid, pt: 0.8 }, margin: 0.02
-          }},
-          { text: course ? (course.room || '') : '', options: {
-            fontFace: 'Arial', fontSize: 10.6, color: textColor,
-            fill: bodyFill, align: 'center', valign: 'mid',
-            border: { type: 'solid', color: grid, pt: 0.8 }, margin: 0.02,
-            fit: 'shrink'
-          }}
-        ]);
-      }
+      const recommendCol = findColumn(headers, [
+        h => h.includes("готовность рекомендовать"),
+        h => h.includes("рекомендовать коллегам"),
+        h => h.includes("готовность рекоменд"),
+        h => h.includes("рекомендовать"),
+        h => h === "nps",
+        h => h.includes("nps")
+      ]);
 
-      return rows;
-    }
+      const applicabilityCol = findColumn(headers, [
+        h => h.includes("применимость в работе"),
+        h => h.includes("применимость"),
+        h => h.includes("полезность в работе"),
+        h => h.includes("полезность"),
+        h => h.includes("применен")
+      ]);
 
-    function renderDayTable(slide, dayCourses) {
-      const tableX = 0.22;
-      const tableY = 0.90;
-      const footerTop = 6.82;
-      const tableBottom = footerTop - 0.14;
-      const tableHeight = tableBottom - tableY;
+      const clarityCol = findColumn(headers, [
+        h => h.includes("понятность донесения информации"),
+        h => h.includes("понятность донесения"),
+        h => h.includes("понятность"),
+        h => h.includes("доступность изложения"),
+        h => h.includes("ясность")
+      ]);
 
-      const visibleBodyRows = Math.max(dayCourses.length, 8);
-      const totalRows = visibleBodyRows + 1;
-      const rowH = tableHeight / totalRows;
+      const organizationCol = findColumn(headers, [
+        h => h.includes("организация учебного мероприятия"),
+        h => h.includes("организация обучения"),
+        h => h.includes("организация мероприятия"),
+        h => h === "организация",
+        h => h.includes("организация")
+      ]);
 
-      const rows = buildTableRows(dayCourses, visibleBodyRows);
-
-      slide.addTable(rows, {
-        x: tableX,
-        y: tableY,
-        w: 12.83,
-        h: tableHeight,
-        colW: [1.00, 1.00, 6.73, 1.80, 0.73, 1.57],
-        rowH: Array(totalRows).fill(rowH),
-        border: { type: 'solid', color: '9CC6CC', pt: 0.8 },
-        margin: 0.02,
-        fontFace: 'Arial',
-        fontSize: 10.6,
-        color: '111111',
-        fill: 'FFFFFF',
-        valign: 'mid',
-        autoFit: false
-      });
-
-      slide.addText('Ежедневно для всех желающих в СИБУРИНТЕХ-НК проводится экскурсия по зданию с посещением учебных классов.', {
-        x: 1.85,
-        y: 6.82,
-        w: 9.8,
-        h: 0.22,
-        fontFace: 'Arial',
-        fontSize: 10.5,
-        color: '111111',
-        align: 'center',
-        margin: 0
-      });
-
-      slide.addText([
-        { text: 'Место встречи: у расписания на 1 этаже в 11:00. ', options: { bold: true } },
-        { text: 'По вопросам экскурсии Вы можете обратиться в кабинет 3.15.' }
-      ], {
-        x: 1.65,
-        y: 7.03,
-        w: 10.2,
-        h: 0.26,
-        fontFace: 'Arial',
-        fontSize: 10.5,
-        color: '111111',
-        align: 'center',
-        margin: 0
-      });
-    }
-
-    async function generatePresentation(file) {
-      setStatus('Читаю Excel…');
-
-      const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-      const { courses, days } = extractCourses(workbook, file.name);
-
-      setStatus(`Найдено курсов по Нижнекамску: ${courses.length}.\nФормирую слайды…`);
-
-      const pptx = new PptxGenJS();
-      pptx.layout = 'LAYOUT_WIDE';
-      pptx.author = 'OpenAI';
-      pptx.company = 'SIBURINTECH';
-      pptx.subject = 'Расписание обучения Нижнекамск';
-      pptx.title = 'Расписание обучения - Нижнекамск';
-      pptx.lang = 'ru-RU';
-      pptx.theme = {
-        headFontFace: 'Arial',
-        bodyFontFace: 'Arial',
-        lang: 'ru-RU'
+      return {
+        courseCol,
+        coordinatorCol,
+        recommendCol,
+        applicabilityCol,
+        clarityCol,
+        organizationCol
       };
-
-      // 1. Общие слайды: Пн–Пт
-      days.forEach(day => {
-        const slide = pptx.addSlide();
-        addTemplateChrome(slide, day);
-        renderDayTable(slide, buildDayCourses(courses, day));
-      });
-
-      // 2. Этажные слайды: 2, 3, 4 этаж — Пн–Пт
-      ['2', '3', '4'].forEach(floor => {
-        days.forEach(day => {
-          const slide = pptx.addSlide();
-          addTemplateChrome(slide, day);
-
-          slide.addText(`Этаж ${floor}`, {
-            x: 10.55,
-            y: 0.62,
-            w: 1.9,
-            h: 0.18,
-            align: 'right',
-            fontFace: 'Arial',
-            fontSize: 10,
-            bold: true,
-            color: 'FFFFFF',
-            margin: 0
-          });
-
-          const floorCourses = buildDayCourses(courses, day).filter(c => c.floor === floor);
-          renderDayTable(slide, floorCourses);
-        });
-      });
-
-      const fileName = `raspisanie-nizhnekamsk-${formatDateShort(days[0])}-${formatDateShort(days[4])}.pptx`;
-
-      setStatus('Скачиваю готовую презентацию…', 'success');
-      await pptx.writeFile({ fileName });
-      setStatus(`Готово. Презентация скачана: ${fileName}`, 'success');
     }
 
-    generateBtn.addEventListener('click', async () => {
-      const file = fileInput.files && fileInput.files[0];
+    function validateColumns(columns, headers) {
+      const missing = [];
 
-      if (!file) {
-        setStatus('Сначала выбери Excel-файл.', 'error');
+      if (!columns.courseCol) missing.push("Не найден столбец с курсом");
+      if (!columns.coordinatorCol) missing.push("Не найден столбец с координатором");
+      if (!columns.recommendCol) missing.push("Не найден столбец 'Рекомендовать'");
+      if (!columns.applicabilityCol) missing.push("Не найден столбец 'Применимость'");
+      if (!columns.clarityCol) missing.push("Не найден столбец 'Понятность'");
+      if (!columns.organizationCol) missing.push("Не найден столбец 'Организация'");
+
+      if (missing.length) {
+        throw new Error(
+          missing.join("\n") +
+          "\n\nНайденные заголовки в файле:\n- " +
+          headers.join("\n- ")
+        );
+      }
+    }
+
+    function renderSummaryTable(data) {
+      const body = document.getElementById("summaryTableBody");
+
+      if (!data.length) {
+        body.innerHTML = `<tr><td colspan="6">Нет данных для отображения.</td></tr>`;
         return;
       }
 
-      generateBtn.disabled = true;
+      body.innerHTML = data.map(row => {
+        const totalClass = row["Направление"] === "ИТОГО" ? "total-row" : "";
+        return `
+          <tr class="${totalClass}">
+            <td>${escapeHtml(row["Направление"])}</td>
+            <td>${formatValue(row["Рекомендовать"])}</td>
+            <td>${formatValue(row["Применимость"])}</td>
+            <td>${formatValue(row["Понятность"])}</td>
+            <td>${formatValue(row["Организация"])}</td>
+            <td>${formatValue(row["Общий NPS"])}</td>
+          </tr>
+        `;
+      }).join("");
+    }
 
-      try {
-        await generatePresentation(file);
-      } catch (error) {
-        console.error(error);
-        setStatus('Ошибка: ' + (error && error.message ? error.message : 'не удалось обработать файл.'), 'error');
-      } finally {
-        generateBtn.disabled = false;
+    function renderTopMetrics(totalRow) {
+      if (!totalRow) return;
+
+      document.getElementById("topMetrics").style.display = "grid";
+      document.getElementById("topRec").textContent = formatValue(totalRow["Рекомендовать"]);
+      document.getElementById("topUse").textContent = formatValue(totalRow["Применимость"]);
+      document.getElementById("topClear").textContent = formatValue(totalRow["Понятность"]);
+      document.getElementById("topOrg").textContent = formatValue(totalRow["Организация"]);
+      document.getElementById("topTotal").textContent = formatValue(totalRow["Общий NPS"]);
+    }
+
+    function formatValue(value) {
+      return Number(value).toFixed(2);
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function buildChart(totalRow) {
+      const ctx = document.getElementById("metricsChart").getContext("2d");
+
+      if (chartInstance) {
+        chartInstance.destroy();
       }
-    });
+
+      const labels = [
+        "Рекомендовать",
+        "Применимость",
+        "Понятность",
+        "Организация"
+      ];
+
+      const values = [
+        totalRow["Рекомендовать"],
+        totalRow["Применимость"],
+        totalRow["Понятность"],
+        totalRow["Организация"]
+      ];
+
+      chartInstance = new Chart(ctx, {
+        data: {
+          labels,
+          datasets: [
+            {
+              type: "bar",
+              label: "Факт",
+              data: values,
+              backgroundColor: [
+                "rgba(11, 92, 171, 0.82)",
+                "rgba(11, 92, 171, 0.82)",
+                "rgba(11, 92, 171, 0.82)",
+                "rgba(11, 92, 171, 0.82)"
+              ],
+              borderColor: [
+                "rgba(11, 92, 171, 1)",
+                "rgba(11, 92, 171, 1)",
+                "rgba(11, 92, 171, 1)",
+                "rgba(11, 92, 171, 1)"
+              ],
+              borderWidth: 1.5,
+              borderRadius: 10,
+              maxBarThickness: 88
+            },
+            {
+              type: "line",
+              label: "Порог 80%",
+              data: [80, 80, 80, 80],
+              borderColor: "#f4c430",
+              backgroundColor: "#f4c430",
+              borderWidth: 3,
+              pointRadius: 0,
+              pointHoverRadius: 0,
+              tension: 0,
+              fill: false
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: {
+            mode: "index",
+            intersect: false
+          },
+          plugins: {
+            legend: {
+              labels: {
+                font: {
+                  size: 14,
+                  weight: "600"
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.dataset.label}: ${Number(context.raw).toFixed(2)}`;
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              min: 0,
+              max: 100,
+              ticks: {
+                stepSize: 10,
+                font: {
+                  size: 13
+                }
+              },
+              grid: {
+                color: "rgba(148, 163, 184, 0.18)"
+              }
+            },
+            x: {
+              ticks: {
+                font: {
+                  size: 13,
+                  weight: "600"
+                }
+              },
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function processFile() {
+      try {
+        const file = document.getElementById("fileInput").files[0];
+        if (!file) {
+          setStatus("Сначала загрузи Excel-файл.", "error");
+          return;
+        }
+
+        setStatus("Читаю файл и считаю показатели...");
+
+        const reader = new FileReader();
+
+        reader.onload = function(e) {
+          try {
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: "array" });
+            const firstSheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[firstSheetName];
+            const rows = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+
+            if (!rows.length) {
+              throw new Error("Файл пустой или первая вкладка не содержит данных.");
+            }
+
+            const headers = Object.keys(rows[0]);
+            const columns = detectColumns(headers);
+            validateColumns(columns, headers);
+
+            const grouped = {};
+
+            rows.forEach(row => {
+              const course = String(row[columns.courseCol] ?? "").trim();
+              const coordinator = String(row[columns.coordinatorCol] ?? "").trim();
+
+              if (!course) return;
+
+              const direction = getDirection(coordinator);
+
+              if (!grouped[direction]) {
+                grouped[direction] = {};
+              }
+
+              if (!grouped[direction][course]) {
+                grouped[direction][course] = {
+                  rec: [],
+                  use: [],
+                  clear: [],
+                  org: []
+                };
+              }
+
+              grouped[direction][course].rec.push(row[columns.recommendCol]);
+              grouped[direction][course].use.push(row[columns.applicabilityCol]);
+              grouped[direction][course].clear.push(row[columns.clarityCol]);
+              grouped[direction][course].org.push(row[columns.organizationCol]);
+            });
+
+            const directionsResult = [];
+            const coursesResult = [];
+
+            const totalByDirections = {
+              rec: [],
+              use: [],
+              clear: [],
+              org: [],
+              total: []
+            };
+
+            Object.keys(grouped).forEach(direction => {
+              const directionMetrics = {
+                rec: [],
+                use: [],
+                clear: [],
+                org: []
+              };
+
+              Object.keys(grouped[direction]).forEach(course => {
+                const data = grouped[direction][course];
+
+                const rec = round2(calcNPS(data.rec));
+                const use = round2(calcNPS(data.use));
+                const clear = round2(calcNPS(data.clear));
+                const org = round2(calcNPS(data.org));
+                const total = round2(avg([rec, use, clear, org]));
+
+                coursesResult.push({
+                  "Направление": direction,
+                  "Курс": course,
+                  "Рекомендовать": rec,
+                  "Применимость": use,
+                  "Понятность": clear,
+                  "Организация": org,
+                  "Общий NPS": total
+                });
+
+                directionMetrics.rec.push(rec);
+                directionMetrics.use.push(use);
+                directionMetrics.clear.push(clear);
+                directionMetrics.org.push(org);
+              });
+
+              const rec = round2(avg(directionMetrics.rec));
+              const use = round2(avg(directionMetrics.use));
+              const clear = round2(avg(directionMetrics.clear));
+              const org = round2(avg(directionMetrics.org));
+              const total = round2(avg([rec, use, clear, org]));
+
+              directionsResult.push({
+                "Направление": direction,
+                "Рекомендовать": rec,
+                "Применимость": use,
+                "Понятность": clear,
+                "Организация": org,
+                "Общий NPS": total
+              });
+
+              totalByDirections.rec.push(rec);
+              totalByDirections.use.push(use);
+              totalByDirections.clear.push(clear);
+              totalByDirections.org.push(org);
+              totalByDirections.total.push(total);
+            });
+
+            const totalRow = {
+              "Направление": "ИТОГО",
+              "Рекомендовать": round2(avg(totalByDirections.rec)),
+              "Применимость": round2(avg(totalByDirections.use)),
+              "Понятность": round2(avg(totalByDirections.clear)),
+              "Организация": round2(avg(totalByDirections.org)),
+              "Общий NPS": round2(avg(totalByDirections.total))
+            };
+
+            directionsResult.push(totalRow);
+
+            lastDirectionsResult = directionsResult;
+            lastCoursesResult = coursesResult;
+
+            renderSummaryTable(directionsResult);
+            renderTopMetrics(totalRow);
+            buildChart(totalRow);
+
+            document.getElementById("downloadBtn").disabled = false;
+            setStatus("Готово: таблица увеличена, график построен, Excel можно скачать.", "ok");
+          } catch (error) {
+            setStatus(error.message || "Ошибка обработки файла.", "error");
+          }
+        };
+
+        reader.onerror = function() {
+          setStatus("Не удалось прочитать файл.", "error");
+        };
+
+        reader.readAsArrayBuffer(file);
+      } catch (error) {
+        setStatus(error.message || "Непредвиденная ошибка.", "error");
+      }
+    }
+
+    function downloadResult() {
+      try {
+        if (!lastDirectionsResult.length) {
+          setStatus("Сначала рассчитай данные.", "error");
+          return;
+        }
+
+        const wb = XLSX.utils.book_new();
+        const ws1 = XLSX.utils.json_to_sheet(lastDirectionsResult);
+        const ws2 = XLSX.utils.json_to_sheet(lastCoursesResult);
+
+        XLSX.utils.book_append_sheet(wb, ws1, "Сводка");
+        XLSX.utils.book_append_sheet(wb, ws2, "Курсы");
+
+        XLSX.writeFile(wb, "NPS_результат.xlsx");
+        setStatus("Excel-файл с результатами скачан.", "ok");
+      } catch (error) {
+        setStatus(error.message || "Не удалось скачать результат.", "error");
+      }
+    }
   </script>
 </body>
 </html>
